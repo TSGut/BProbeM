@@ -6,7 +6,7 @@
 
 ## Installation & Getting Started
 
-Please see the [project wiki](https://github.com/vootey/BProbe/wiki).
+Please see the [project wiki page](https://github.com/vootey/BProbe/wiki/Installation-&-Getting-Started).
 
 
 
