@@ -1,7 +1,5 @@
 (* ::Package:: *)
 
-$url = "todo";
-
 Needs["Utilities`URLTools`"];
 
 
@@ -29,9 +27,7 @@ CompareVersionString[vOld_,vNew_]:= Block[{i, vlOld,vlNew},
 
 
 GetMetaData[projectpath_]:= Block[{metadata},
-	metadata = Association[Import[FileNameJoin[{projectpath, "project.m"}]]];
-	metadata[author] = Association[metadata[author]];
-	
+	metadata = Import[FileNameJoin[{projectpath, "project.json"}], "RawJSON"]
 	Return[metadata];
 ];
 
@@ -43,13 +39,18 @@ CleanUp[root_] := Block[{},
 
 
 
-Block[{locdir, files, root, meta, metaloc, result},
+Block[{locdir, files, root, meta, metaloc, result, json, url},
 
 	locdir = FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe"}];
 
+	Print["Fetch latest version url ..."];
+	json = ImportString[URLFetch["https://api.github.com/repos/vootey/BProbe/releases/latest"],"RawJSON"];
+	url = json["assets"][[1]]["browser_download_url"];
+	Print["URL: " <> url];
+
 	Print["Download and extract archive ..."];
 	root = CreateDirectory[];
-	files = ExtractArchive[FetchURL[ $url ], root];
+	files = ExtractArchive[FetchURL[ url ], root];
 	
 	root = FileNameJoin[{root, "BProbe"}];
 	If[Not[DirectoryQ[root]],
@@ -94,6 +95,3 @@ Block[{locdir, files, root, meta, metaloc, result},
 		Print["Package successfully installed into " <> locdir];
 	];
  ];
-
-
-
