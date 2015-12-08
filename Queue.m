@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 (*
 	Copyright 2015 Lukas Schneiderbauer
 
@@ -21,7 +23,7 @@
 
 
 
-Needs["MathProg`Classes`","Classes.m"]; (* Class support *)
+Needs["MathProg`Classes`",FileNameJoin[{"BProbe","Classes.m"}]]; (* Class support *)
 
 Class[Queue, Object,
 
