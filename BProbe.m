@@ -29,8 +29,8 @@ BeginPackage["BProbe`"];
     (* formatting stuff for usage messages	*)
 	(****************************************)
 	
-	link[name_] := ToString[Hyperlink[name, FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe", "Documentation", name <> ".html"}]], StandardForm];
-	link[name_, alias_] := ToString[Hyperlink[alias, FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe", "Documentation", name <> ".html"}]], StandardForm];
+	link[name_] := ToString[Hyperlink[name, "file://" <> FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe", "Documentation", name <> ".html"}]], StandardForm];
+	link[name_, alias_] := ToString[Hyperlink[alias, "file://" <> FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe", "Documentation", name <> ".html"}]], StandardForm];
 	doc[name_] := ToString[Hyperlink[name, "paclet:ref/" <> name], StandardForm];
 	italic[name_] := ToString[Style[name, Italic, Small], StandardForm];
 	bold[name_] := ToString[Style[name, Bold], StandardForm];
@@ -160,4 +160,4 @@ End[]
 
 EndPackage[]
 
-Print["Successfully loaded BProbe. See the " <> link["Home", "documentation"] <> " for help."];
+Print["Successfully loaded BProbe. See the " <> link["index", "documentation"] <> " for help."];
