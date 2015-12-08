@@ -27,7 +27,7 @@ CompareVersionString[vOld_,vNew_]:= Block[{i, vlOld,vlNew},
 
 
 GetMetaData[projectpath_]:= Block[{metadata},
-	metadata = Import[FileNameJoin[{projectpath, "project.json"}], "RawJSON"]
+	metadata = Import[FileNameJoin[{projectpath, "project.json"}], "RawJSON"];
 	Return[metadata];
 ];
 
@@ -51,7 +51,7 @@ Block[{locdir, files, root, meta, metaloc, result, json, url},
 	Print["Download and extract archive ..."];
 	root = CreateDirectory[];
 	files = ExtractArchive[FetchURL[ url ], root];
-	
+
 	root = FileNameJoin[{root, "BProbe"}];
 	If[Not[DirectoryQ[root]],
 		Print["The archive folder structure is not as expected ... Aborting."];
@@ -62,8 +62,8 @@ Block[{locdir, files, root, meta, metaloc, result, json, url},
 	meta = GetMetaData[root];
 	
 	(* Check Mathematica Version *)
-	If[$VersionNumber < ToExpression[meta[mathematica_version]],
-		Print["Your Mathematica version should at least be " <> ToString[meta[mathematica_version]] <> " ... Aborting."];
+	If[$VersionNumber < ToExpression[meta["mathematica_version"]],
+		Print["Your Mathematica version should at least be " <> ToString[meta["mathematica_version"]] <> " ... Aborting."];
 		CleanUp[root];
 		Abort[];
 	];
@@ -72,10 +72,10 @@ Block[{locdir, files, root, meta, metaloc, result, json, url},
 	If[DirectoryQ[locdir], (* Is it possibly an update? *)
 		metaloc = GetMetaData[locdir];
 	
-		If[CompareVersionString[metaloc[version], meta[version]] <= 0,
+		If[CompareVersionString[metaloc["version"], meta["version"]] <= 0,
 			Print["This package (with version equal or higher) is already installed ... Aborting."];
-			Print["Current Version: " <> ToString[metaloc[version]]];
-			Print["Version to be installed: " <> ToString[meta[version]]];
+			Print["Current Version: " <> ToString[metaloc["version"]]];
+			Print["Version to be installed: " <> ToString[meta["version"]]];
 			CleanUp[root];
 			Abort[];
 		,
