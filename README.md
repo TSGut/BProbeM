@@ -1,7 +1,6 @@
-# What is `BProbe`?
+## What is `BProbe`?
 
 `BProbe` is a [Wolfram Mathematica](https://www.wolfram.com/mathematica/) package. It is the implementation of an algorithm which rasterizes the semi-classical limit of a fuzzy brane described by a set of matrices. The underlying theory is not described in this document, and for a comprehensive treatment is referred to TODO-paper.
-
 
 
 
@@ -34,12 +33,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with BProbe.  If not, see <http://www.gnu.org/licenses/>.
-
-
-
-## Media Licence
-
-All images in Documentation/media are licensed under the Creative Commons Attribution 4.0 International License. To view a copy of this license, visit <http://creativecommons.org/licenses/by/4.0/>.
 
 
 
