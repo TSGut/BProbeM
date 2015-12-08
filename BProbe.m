@@ -25,55 +25,7 @@
 
 BeginPackage["BProbe`"];
 
-
-    (* formatting stuff for usage messages	*)
-	(****************************************)
-	
-	link[name_] := ToString[Hyperlink[name, "file://" <> FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe", "Documentation", name <> ".html"}]], StandardForm];
-	link[name_, alias_] := ToString[Hyperlink[alias, "file://" <> FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe", "Documentation", name <> ".html"}]], StandardForm];
-	doc[name_] := ToString[Hyperlink[name, "paclet:ref/" <> name], StandardForm];
-	italic[name_] := ToString[Style[name, Italic, Small], StandardForm];
-	bold[name_] := ToString[Style[name, Bold], StandardForm];
-
-
-	header[name_, args_] := Block[{str, i},
-		str = link[name] <> "[";
-		For[i=1,i<=Length[args],i++,
-			str = str <> " _" <> doc[args[[i,1]]] <> " :: " <> italic[args[[i,2]]] <> " ";
-			If[i<Length[args], str = str <> ","];
-		];
-
-		str = str <> "]";
-		Return[str];
-    ];
-	
-	(*										*)
-	(****************************************)
-	
-
-
-	
-(* The sole PUBlIC API of this package *)
-(***************************************************************************************)
-
-
-	ProbeInit::usage = header["ProbeInit", {{"List", "list of matrices"}}] <> " expects a list of d matrices. This method takes care of building the appropriate (Laplace-/Dirac-) operator for you which is needed to perform the rasterizing procedure. " <> bold["Note that calling this method is absolutely required before other methods of this package can be used!"] <> "."
-	
-	ProbeScan::usage = header["ProbeScan", {{"Integer", "dimension"}, {"Real", "step size"}}] <> " performs the actual scanning procedure. It implements an algorithm to rasterize the semi-classical limit of the brane configuration defined by a set of matrices as submanifold of the target space.";
-	
-	ProbeGetPointList::usage = header["ProbeGetPointList",{}] <> " returns a " <> doc["List"] <> " of already calculated points. A point is itself represented as a " <> doc["List"] <> " consisting of d " <> doc["Real"] <> "s.";
-	
-	ProbeReset::usage = header["ProbeReset",{}] <> " resets the package in a way, so that the command " <> header["ProbeScan", {{"Integer", "dimension"}, {"Real", "step size"}}] <> " starts a completely new calculation.";
-	
-	ProbeGetMinEigenvalue::usage = header["ProbeGetMinEigenvalue", {{"List", "point"}}] <> " returns the minimal eigenvalue (with respect to the modulus) of the (Laplace-/Dirac-) operator in question for a given point.";
-	
-	ProbeGetEigenvalues::usage = header["ProbeGetEigenvalues", {{"List", "point"}}] <> " returns the eigenvalues of the (Laplace-/Dirac-) operator in question for a given point.";
-	
-	ProbeGetState::usage = header["ProbeGetState", {{"List", "point"}}] <> " returns the eigenvector corresponding to the minimal eigenvalue (with respect to the modulus) of the (Laplace-/Dirac-) operator in question for a given point.";
-
-(***************************************************************************************)
-
-
+(* for usage messages: see the end of this package *)
 
 
 Begin["`Private`"];
@@ -156,8 +108,51 @@ Begin["`Private`"];
 	];
 	
 
-End[]
 
-EndPackage[]
 
-Print["Successfully loaded BProbe. See the " <> link["index", "documentation"] <> " for help."];
+    (* formatting stuff for usage messages	*)
+	(****************************************)
+	
+	link[name_] := ToString[Hyperlink[name, "file://" <> FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe", "Documentation", name <> ".html"}]], StandardForm];
+	link[name_, alias_] := ToString[Hyperlink[alias, "file://" <> FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe", "Documentation", name <> ".html"}]], StandardForm];
+	doc[name_] := ToString[Hyperlink[name, "paclet:ref/" <> name], StandardForm];
+	italic[name_] := ToString[Style[name, Italic, Small], StandardForm];
+	bold[name_] := ToString[Style[name, Bold], StandardForm];
+	header[name_, args_] := Block[{i, str},
+		str = link[name] <> "[";
+		For[i=1,i<=Length[args],i++,
+			str = str <> " _" <> doc[args[[i,1]]] <> " :: " <> italic[args[[i,2]]] <> " ";
+			If[i<Length[args], str = str <> ","];
+		];
+
+		str = str <> "]";
+		Return[str];
+    ];
+	(*										*)
+	(****************************************)
+
+
+End[];
+
+
+	
+(* The sole PUBlIC API of this package *)
+(***************************************************************************************)
+	ProbeInit::usage = BProbe`Private`header["ProbeInit", {{"List", "list of matrices"}}] <> " expects a list of d matrices. This method takes care of building the appropriate (Laplace-/Dirac-) operator for you which is needed to perform the rasterizing procedure. " <> BProbe`Private`bold["Note that calling this method is absolutely required before other methods of this package can be used!"] <> "."
+	
+	ProbeScan::usage = BProbe`Private`header["ProbeScan", {{"Integer", "dimension"}, {"Real", "step size"}}] <> " performs the actual scanning procedure. It implements an algorithm to rasterize the semi-classical limit of the brane configuration defined by a set of matrices as submanifold of the target space.";
+	
+	ProbeGetPointList::usage = BProbe`Private`header["ProbeGetPointList",{}] <> " returns a " <> BProbe`Private`doc["List"] <> " of already calculated points. A point is itself represented as a " <> BProbe`Private`doc["List"] <> " consisting of d " <> BProbe`Private`doc["Real"] <> "s.";
+	
+	ProbeReset::usage = BProbe`Private`header["ProbeReset",{}] <> " resets the package in a way, so that the command " <> BProbe`Private`header["ProbeScan", {{"Integer", "dimension"}, {"Real", "step size"}}] <> " starts a completely new calculation.";
+	
+	ProbeGetMinEigenvalue::usage = BProbe`Private`header["ProbeGetMinEigenvalue", {{"List", "point"}}] <> " returns the minimal eigenvalue (with respect to the modulus) of the (Laplace-/Dirac-) operator in question for a given point.";
+	
+	ProbeGetEigenvalues::usage = BProbe`Private`header["ProbeGetEigenvalues", {{"List", "point"}}] <> " returns the eigenvalues of the (Laplace-/Dirac-) operator in question for a given point.";
+	
+	ProbeGetState::usage = BProbe`Private`header["ProbeGetState", {{"List", "point"}}] <> " returns the eigenvector corresponding to the minimal eigenvalue (with respect to the modulus) of the (Laplace-/Dirac-) operator in question for a given point.";
+(***************************************************************************************)
+
+EndPackage[];
+
+Print["Successfully loaded BProbe. See the " <> BProbe`Private`link["index", "documentation"] <> " for help."];
