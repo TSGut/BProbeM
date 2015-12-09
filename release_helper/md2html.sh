@@ -1,7 +1,15 @@
+#!/bin/sh
+
+
 #
 # this script basically converts the github wiki into html files
 #
+source=`realpath ${1}`
+target=`realpath ${2}`
+rhelper=`realpath ./BProbe/release_helper/`
+echo $rhelper
 
+cd $source
 
 for filename in *.md; do
 	basename=$(basename $filename .md)
@@ -19,8 +27,8 @@ for filename in *.md; do
 
 	# add header to each file
 	# convert md -> html
-	echo "# $title" | cat - $filename | pandoc -f markdown_github -t html5 -o ${basename}.html -s --self-contained --css=github-pandoc.css
+	echo "# $title" | cat - $filename | pandoc -f markdown_github -t html5 -o ${target}/${basename}.html -s --self-contained --css="${rhelper}/github-pandoc.css"
 
 	# fix links
-	./fix_links.py ${basename}.html
+	${rhelper}/fix_links.py ${target}/${basename}.html
 done
