@@ -1,11 +1,16 @@
 #!/bin/sh
 
-# TODO: change version in "project.json"
+tag=v${1}	# versiont ag
 
-# create a git tag $tag before doing this
-tag="v0.1.1"
+# update version in project.json file
+./update_version.rb ${1}
+
+read -p "Warning: git commit and 'tag v${1}' are to be created. Are you sure?"
 
 cd ../
+
+git commit ./project.json -m "update version"
+git tag $tag
 git archive --format tar ${tag} --output ../BProbe-${tag}.tar --prefix=BProbe/
 
 cd ../
