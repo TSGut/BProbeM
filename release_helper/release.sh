@@ -9,7 +9,7 @@ read -p "Warning: git commit and 'tag v${1}' are to be created. Are you sure?"
 
 cd ../
 
-git commit ./project.json -m "update version"
+git commit ./project.json -m "update version to ${tag}"
 git tag $tag
 git archive --format tar ${tag} --output ../BProbe-${tag}.tar --prefix=BProbe/
 
