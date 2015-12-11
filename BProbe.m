@@ -25,6 +25,17 @@
 
 BeginPackage["BProbe`"];
 
+(* The sole PUBlIC API of this package *)
+(* see the documentation for explanations *)
+(***************************************************************************************)
+	ProbeInit::usage = "";
+	ProbeScan::usage = "";
+	ProbeGetPointList::usage = "";
+	ProbeReset::usage = "";
+	ProbeGetMinEigenvalue::usage = "";
+	ProbeGetEigenvalues::usage = "";
+	ProbeGetState::usage = "";
+(***************************************************************************************)
 (* for usage messages: see the end of this package *)
 
 
