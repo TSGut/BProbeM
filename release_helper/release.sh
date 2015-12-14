@@ -1,11 +1,14 @@
 #!/bin/sh
 
+
+# TODO: pull latest wiki docs
+
 tag=v${1}	# versiont ag
 
 # update version in project.json file
 ./update_version.rb ${1}
 
-read -p "Warning: git commit and 'tag v${1}' are to be created. Are you sure?"
+read -p "Warning: git commit and 'tag v${1}' are to be created. Are you sure? (You should pull latest wiki docs before doing this)"
 
 cd ../
 
