@@ -49,7 +49,7 @@ Begin["`Private`"];
 
 
 	Options[ProbeInit] = Options[BProbe`Walk`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
-	ProbeInit[t_, opts:OptionsPattern[]] := Block[{p,dim,n,m,expr,i,gamma},
+	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,dim,n,m,expr,i,gamma},
 		
 		dim = Length[t];				(* dimension of target space *)
 		n = Length[t[[1]]];				(* n times n matrices *)
@@ -89,7 +89,10 @@ Begin["`Private`"];
 	];
 
 	Options[ProbeScan] = Options[BProbe`Walk`start] ~Join~ {MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], LogFile->""};
-	ProbeScan[bdim_, stepsize_, opts:OptionsPattern[]] := Block[{result},
+
+	ProbeScan[bdim_?IntegerQ /; bdim > 0, stepsize_?NumericQ /; stepsize > 0,
+		opts:OptionsPattern[]
+	] := Block[{result},
 	
 		result = BProbe`Walk`start[bdim, stepsize,
 			OptionValue[MaxFunctionValue],
@@ -110,15 +113,15 @@ Begin["`Private`"];
 		Return[BProbe`Walk`getlist[]];
 	];
 	
-	ProbeGetMinEigenvalue[p_] := Block[{},
+	ProbeGetMinEigenvalue[p_?(VectorQ[#,NumericQ]&)] := Block[{},
 		Return[Abs[Eigenvalues[cm @@ N[p], -1][[1]]]];
 	];
 	
-	ProbeGetEigenvalues[p_] := Block[{},
+	ProbeGetEigenvalues[p_?(VectorQ[#,NumericQ]&)] := Block[{},
 		Return[Eigenvalues[cm @@ N[p]]];
 	];
 	
-	ProbeGetState[p_] := Block[{},
+	ProbeGetState[p_?(VectorQ[#,NumericQ]&)] := Block[{},
 		Return[Eigensystem[cm @@ N[p],-1][[2,1]]];
 	];
 	
@@ -129,8 +132,8 @@ Begin["`Private`"];
 	MatrixRepSU3[list_?(VectorQ[#,NumericQ] &) /;
 			Length[list]==2 &&
 			list[[1]]>=0 &&
-			list[[2]]>=0] :=
-	Block[{},
+			list[[2]]>=0
+	] := Block[{},
 		Return[BProbe`SU3Gen`Private`MatrixRepSU3[list]];
 	];
 
