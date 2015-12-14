@@ -59,21 +59,29 @@ Begin["`Private`"];
 			p[[Complement[Range[dim],OptionValue[Subspace]]]] = 0;
 		];
 		
-		If[OptionValue[Probe] == "Laplace",
+		Switch[OptionValue[Probe],
+		
+		"Laplace",
 			Print["Building Laplace Operator ..."];
 		
 			m = Sum[(IdentityMatrix[n] p[[i]] - t[[i]]).(IdentityMatrix[n] p[[i]] - t[[i]]), {i, 1, dim}];
-			expr = Simplify[ComplexExpand[m], Element[p, Reals]];
+			
 		
-		,If[OptionValue[Probe] == "Dirac",
+		,"Dirac",
 			Print["Building Dirac Operator ..."];
 			
 			gamma = BProbe`Gamma`MatrixRepGamma[dim];
 			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
-			expr = Simplify[ComplexExpand[m], Element[p, Reals]];
 			
-		]];
+		,"DiracSq",
+			Print["Building square of Dirac Operator ..."];
+			
+			gamma = BProbe`Gamma`MatrixRepGamma[dim];
+			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
+			m = m.m;
+		];
 		
+		expr = Simplify[ComplexExpand[m], Element[p, Reals]];
 		cm = Compile @@ {DeleteCases[p,0], expr};
 		func[x_] := Abs[Eigenvalues[cm @@ N[x], -1][[1]]];
 		
