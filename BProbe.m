@@ -35,6 +35,8 @@ BeginPackage["BProbe`"];
 	ProbeGetMinEigenvalue::usage = "";
 	ProbeGetEigenvalues::usage = "";
 	ProbeGetState::usage = "";
+	MatrixRepSU2::usage = "";
+	MatrixRepSU3::usage = "";
 (***************************************************************************************)
 (* for usage messages: see the end of this package *)
 
@@ -42,7 +44,9 @@ BeginPackage["BProbe`"];
 Begin["`Private`"];
 	Get[ "BProbe`Walk`" ];
 	Get[ "BProbe`Gamma`" ];
-	
+	Get[ "BProbe`SU2Gen`" ];
+	Get[ "BProbe`SU3Gen`" ];
+
 
 	Options[ProbeInit] = Options[BProbe`Walk`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
 	ProbeInit[t_, opts:OptionsPattern[]] := Block[{p,dim,n,m,expr,i,gamma},
@@ -118,7 +122,17 @@ Begin["`Private`"];
 		Return[Eigensystem[cm @@ N[p],-1][[2,1]]];
 	];
 	
-
+	MatrixRepSU2[n_?NumericQ /; n>0] := Block[{},
+		Return[BProbe`SU2Gen`Private`MatrixRepSU2[n]];
+	];
+	
+	MatrixRepSU3[list_?(VectorQ[#,NumericQ] &) /;
+			Length[list]==2 &&
+			list[[1]]>=0 &&
+			list[[2]]>=0] :=
+	Block[{},
+		Return[BProbe`SU3Gen`Private`MatrixRepSU3[list]];
+	];
 
 
     (* formatting stuff for usage messages	*)
@@ -146,7 +160,7 @@ Begin["`Private`"];
 End[];
 
 
-	
+
 (* The sole PUBlIC API of this package *)
 (***************************************************************************************)
 	ProbeInit::usage = BProbe`Private`header["ProbeInit", {{"List", "list of matrices"}}] <> " expects a list of d matrices. This method takes care of building the appropriate (Laplace-/Dirac-) operator for you which is needed to perform the rasterizing procedure. " <> BProbe`Private`bold["Note that calling this method is absolutely required before other methods of this package can be used!"] <> "."
