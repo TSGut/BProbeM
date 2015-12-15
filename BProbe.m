@@ -68,19 +68,19 @@ Begin["`Private`"];
 		Switch[OptionValue[Probe],
 		
 		"Laplace",
-			Print["Building Laplace Operator ..."];
+			Print["Compiling Laplace Operator ..."];
 		
 			m = Sum[(IdentityMatrix[n] p[[i]] - t[[i]]).(IdentityMatrix[n] p[[i]] - t[[i]]), {i, 1, dim}];
 			
 		
 		,"Dirac",
-			Print["Building Dirac Operator ..."];
+			Print["Compiling Dirac Operator ..."];
 			
 			gamma = BProbe`Gamma`MatrixRepGamma[dim];
 			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
 			
 		,"DiracSq",
-			Print["Building square of Dirac Operator ..."];
+			Print["Compiling square of Dirac Operator ..."];
 			
 			gamma = BProbe`Gamma`MatrixRepGamma[dim];
 			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
@@ -93,6 +93,7 @@ Begin["`Private`"];
 		func[x_] := Abs[Eigenvalues[cm @@ N[x], -1][[1]]];	(* define the function to be quasi-minimized *)
 		
 		(* compile expectation value of state *)
+		Print["Compiling expectation-value function ..."];
 		x = Table[Unique["x"], n];
 		expr = Simplify[ (Conjugate[x].#.x)& /@ t[[subspace]] ];
 		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr};
