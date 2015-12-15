@@ -49,7 +49,7 @@ Begin["`Private`"];
 
 
 	Options[ProbeInit] = Options[BProbe`Scan`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
-	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,x,dim,n,m,expr,i,gamma,subspace},
+	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,x,dim,n,gn,m,expr,eexpr,i,gamma,subspace},
 		
 		dim = Length[t];				(* dimension of target space *)
 		n = Length[t[[1]]];				(* n times n matrices *)
@@ -72,6 +72,9 @@ Begin["`Private`"];
 		
 			m = Sum[(IdentityMatrix[n] p[[i]] - t[[i]]).(IdentityMatrix[n] p[[i]] - t[[i]]), {i, 1, dim}];
 			
+			(* prepare for later *)
+			x = Table[Unique["x"], n];
+			eexpr = (Conjugate[x].#.x)& /@ t[[subspace]];
 		
 		,"Dirac",
 			Print["Compiling Dirac Operator ..."];
@@ -79,26 +82,36 @@ Begin["`Private`"];
 			gamma = BProbe`Gamma`MatrixRepGamma[dim];
 			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
 			
+			(* prepare for later *)
+			gn = Length[gamma[[1]]];
+			x = Table[Unique["x"], n*gn];
+			eexpr = (Conjugate[x].KroneckerProduct[IdentityMatrix[gn],#].x)& /@ t[[subspace]];
+			
 		,"DiracSq",
 			Print["Compiling square of Dirac Operator ..."];
 			
 			gamma = BProbe`Gamma`MatrixRepGamma[dim];
 			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
 			m = m.m;
+			
+			(* prepare for later *)
+			gn = Length[gamma[[1]]];
+			x = Table[Unique["x"], n*gn];
+			eexpr = (Conjugate[x].KroneckerProduct[IdentityMatrix[gn],#].x)& /@ t[[subspace]];
+			
 		];
+		
 		
 		(* compile the operator for (a lot) better performance *)
 		expr = Simplify[ComplexExpand[m], Element[p, Reals]];
 		cm = Compile @@ {DeleteCases[p,0], expr};
-		func[x_] := Abs[Eigenvalues[cm @@ N[x], -1][[1]]];	(* define the function to be quasi-minimized *)
+		func[y_] := Abs[Eigenvalues[cm @@ N[y], -1][[1]]];	(* define the function to be quasi-minimized *)
 		
 		(* compile expectation value of state *)
 		Print["Compiling expectation-value function ..."];
-		x = Table[Unique["x"], n];
-		expr = Simplify[ (Conjugate[x].#.x)& /@ t[[subspace]] ];
-		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr};
-		expf[x_] := Block[{state},
-			state = Eigenvectors[cm @@ N[x], -1][[1]];
+		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], eexpr};
+		expf[y_] := Block[{state},
+			state = Eigenvectors[cm @@ N[y], -1][[1]];
 			Return[Re[cexp @@ state]]; (* they should be real (always ?! todo) *)
 		];
 
