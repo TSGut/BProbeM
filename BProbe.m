@@ -49,15 +49,20 @@ Begin["`Private`"];
 
 
 	Options[ProbeInit] = Options[BProbe`Scan`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
-	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,x,dim,n,m,expr,i,gamma},
+	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,x,dim,n,m,expr,i,gamma,subspace},
 		
 		dim = Length[t];				(* dimension of target space *)
 		n = Length[t[[1]]];				(* n times n matrices *)
 		
-		p = Table[Unique["p"], {dim}];
-		If[ListQ[OptionValue[Subspace]],
-			p[[Complement[Range[dim],OptionValue[Subspace]]]] = 0;
+		If[Not[ListQ[OptionValue[Subspace]]],
+			subspace = Range[1, dim]; 			(* in this case, take the full space *)
+		,
+			subspace = OptionValue[Subspace];
 		];
+		
+		p = Table[Unique["p"], {dim}];
+		p[[Complement[Range[dim],subspace]]] = 0;
+		
 		
 		(* build appropriate operator/matrix *)
 		Switch[OptionValue[Probe],
@@ -89,7 +94,7 @@ Begin["`Private`"];
 		
 		(* compile expectation value of state *)
 		x = Table[Unique["x"], n];
-		expr = Simplify[ (Conjugate[x].#.x)& /@ t[[OptionValue[Subspace]]] ];
+		expr = Simplify[ (Conjugate[x].#.x)& /@ t[[subspace]] ];
 		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr};
 		expf[x_] := Block[{state},
 			state = Eigenvectors[cm @@ N[x], -1][[1]];
