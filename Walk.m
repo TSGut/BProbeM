@@ -49,19 +49,19 @@ Begin["`Private`"];
 				Print["Look for global minimum ..."];
 				f2[p__?NumericQ] := Abs[func[{p}]];
 				s = NMinimize[f2 @@ x,x];
-				startState = x /. s[[2]];
+				startPoint = x /. s[[2]];
 				
 			,
-				startState = OptionValue[StartingPoint];
+				startPoint = OptionValue[StartingPoint];
 			];
 			
 			reset[opts];
 
 			Print["---"];
 
-			Print["Minimum / Starting point:\n", func[startState], " at ", startState];
-			Print["Gradient:\n", NGradient[func,startState]];
-			Print["Abs Hess. Eigv:\n", Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startState, Scale -> 0.01]]]];
+			Print["Minimum / Starting point:\n", func[startPoint], " at ", startPoint];
+			Print["Gradient:\n", NGradient[func,startPoint]];
+			Print["Abs Hess. Eigv:\n", Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]]];
 			
 			inited=True; (* say: okay, we did a initialization *)
 		];
@@ -71,14 +71,14 @@ Begin["`Private`"];
 	reset[OptionsPattern[]] := Block[{},
 		
 			If[ListQ[OptionValue[StartingPoint]],
-				startState = OptionValue[StartingPoint];
+				startPoint = OptionValue[StartingPoint];
 			]; 
 		
 			(* init stuff *)
-			states = {};
-			AppendTo[states, startState];
+			pointlist = {};
+			AppendTo[pointlist, startPoint];
 			boundary = new[Queue];
-			boundary.push[{startState,startState}];
+			boundary.push[{startPoint,startPoint}];
 		
 			rejectedCounterGrad = 0;
 			rejectedCounterVal = 0;
@@ -86,13 +86,13 @@ Begin["`Private`"];
 	];
 	
 	
-	getlist[] := Return[states];
+	getlist[] := Return[pointlist];
 
 
 	Options[start] = {MinimalSurface -> False}
 	start[numberld_, ssize_, maxv_, maxevr_, gradtolf_, logfilename_, OptionsPattern[]] := 
 		(* [number of directions, step size, tol factor for function value, ratio tol factor, tol factor for gradient, filename of log file] *)
-		Block[{pstate, cstate, nstates, minpos, m, i},
+		Block[{ppoint, cpoint, npoints, minpos, m, i},
 
 			step = ssize;
 			numberldirs = numberld;
@@ -113,67 +113,67 @@ Begin["`Private`"];
 			logger = new[Logger,logfilename];			
 
 
-			cstate = Last[states];
-			pstate = Last[states];
+			cpoint = Last[pointlist];
+			ppoint = Last[pointlist];
 
 
 			(* CORE *)
 			Monitor[Monitor[Monitor[Monitor[Monitor[
 			While[boundary.size[] != 0,
-				{pstate, cstate} = boundary.pop[];
+				{ppoint, cpoint} = boundary.pop[];
 
 
-				nstates = doStep[pstate, cstate];
+				npoints = doStep[ppoint, cpoint];
 
-				(* append new states, boundary info  + pstates *)
+				(* append new points, boundary info  + ppoints *)
 				boundary.pushList[Thread[{
-					Table[cstate,{Length[nstates]}] ,
-					nstates
+					Table[cpoint,{Length[npoints]}] ,
+					npoints
 				}]];
-				states = Join[states, nstates];
+				pointlist = Join[pointlist, npoints];
 
 				log[logger,
-					"state accepted -" <> TextString[#]
-				]& /@ nstates;
+					"point accepted -" <> TextString[#]
+				]& /@ npoints;
 
 			];
 			, "Points at boundary: " <> TextString[size[boundary]]]
 			, "Rejected points (Gradient): " <> TextString[rejectedCounterGrad]]
 			, "Rejected points (FuncValue): " <> TextString[rejectedCounterVal]]
 			, "Rejected points (EVRatio): " <> TextString[rejectedCounterRat]]
-			, "Added points: " <> TextString[Length[states]]];
+			, "Added points: " <> TextString[Length[pointlist]]];
 
 
 			close[logger];
-			Return[states];
+			Return[pointlist];
 		];
 
 
-	doStep[pstate_,cstate_]:= (* [paststate, currentstate] *)
-		Block[{nstates,dirs},
+	doStep[ppoint_,cpoint_]:= (* [pastpoint, currentpoint] *)
+		Block[{npoints,dirs},
 		
-			dirs = determineDirections[cstate];
-			dirs = processDirections[cstate, dirs*step];
-			dirs = filterDirections[pstate, cstate, dirs];
+			dirs = determineDirections[cpoint];
+			dirs = processDirections[cpoint, dirs*step];
+			dirs = filterDirections[ppoint, cpoint, dirs];
 
-			nstates = (cstate + #)& /@ dirs;
+			npoints = (cpoint + #)& /@ dirs;
 
-			Return[nstates];
+			Return[npoints];
 		];
 
 
 (* PRIVATE METHODS (informal) *)
 
-	determineDirections[state_]:= (* [state, tolerance] *)
+	determineDirections[point_]:= (* [point, tolerance] *)
 		Block[{nhess, directions},
 			
-			nhess = NHessian[func, state, Scale -> step/10];
+			nhess = NHessian[func, point, Scale -> step/10];
 			
 			
 			(* This should actually be checked in the "QValidDirection" method, but *)
 			(* then the hessian would have to be recalculated.. so for performance reasons ... *)
 			If[QEVRatioTooHigh[nhess],
-				log[logger, "state rejected (evratiotoohigh) -" <> TextString[TextString[state]]];
+				log[logger, "point rejected (evratiotoohigh) -" <> TextString[TextString[point]]];
 				rejectedCounterRat += 1;
 				
 				Return[{}];
@@ -186,8 +186,8 @@ Begin["`Private`"];
 		];
 
 
-	processDirections[state_,directions_] :=
-		Block[{processed, i, nstate, p, f2, s},
+	processDirections[point_,directions_] :=
+		Block[{processed, i, npoint, p, f2, s},
 			
 			processed = {};
 			
@@ -203,13 +203,13 @@ Begin["`Private`"];
 				f2[p__?NumericQ] := func[{p}];
 				For[i=1, i<=Length[processed], i++,
 					
-					nstate = state + processed[[i]];
-					p = Table[Unique["p"], {Length[state]}];
+					npoint = point + processed[[i]];
+					p = Table[Unique["p"], {Length[point]}];
 				
-					Quiet[s = FindMinimum[f2 @@ p, Thread[{p,nstate}]]];
+					Quiet[s = FindMinimum[f2 @@ p, Thread[{p,npoint}]]];
 					(* , MaxIterations->5 *)
 					
-					processed = ReplacePart[processed, i -> ((p /. s[[2]]) - state)];
+					processed = ReplacePart[processed, i -> ((p /. s[[2]]) - point)];
 				
 				];
 			];
@@ -220,14 +220,14 @@ Begin["`Private`"];
 		];
 
 
-	filterDirections[pstate_,cstate_,directions_] := (* [paststate, currentstate, directions] *)
+	filterDirections[ppoint_,cpoint_,directions_] := (* [pastpoint, currentpoint, directions] *)
 		Block[{filtered, i},
 
 			filtered = {};
 
 			For[i=1, i<=Length[directions], i++, (* for each direction *)
 
-				If[QValidDirection[pstate, cstate, directions[[i]], directions],
+				If[QValidDirection[ppoint, cpoint, directions[[i]], directions],
 					(* add *)
 					AppendTo[filtered, directions[[i]]];
 				];
@@ -238,40 +238,40 @@ Begin["`Private`"];
 		];
 
 
-	norm[state_]:= (* [state] *)
-		state/Norm[state]
+	norm[point_]:= (* [point] *)
+		point/Norm[point]
 
 
-	QValidDirection[pstate_,cstate_,dir_,dirs_]:= (* [paststate, currentstate, direction] *)
-		Block[{nstate},
-			nstate = cstate + dir;
+	QValidDirection[ppoint_,cpoint_,dir_,dirs_]:= (* [pastpoint, currentpoint, direction] *)
+		Block[{npoint},
+			npoint = cpoint + dir;
 
-				If[Not[QBack[pstate, nstate]],
-					If[Not[QValueTooHigh[nstate]],
-						If[Not[QGradientTooHigh[nstate,dirs]],
-							If[Not[QNearStatesFull[nstate]],
+				If[Not[QBack[ppoint, npoint]],
+					If[Not[QValueTooHigh[npoint]],
+						If[Not[QGradientTooHigh[npoint,dirs]],
+							If[Not[QNearPoints[npoint]],
 								Return[True];
 							,
 								log[logger,
-									"state rejected (nearstates) -" <>
-									TextString[nstate] <> "-" <> TextString[pstate]];
+									"point rejected (nearpoints) -" <>
+									TextString[npoint] <> "-" <> TextString[ppoint]];
 							];
 						,
 							log[logger,
-								"state rejected (gradienttoohigh) -" <>
-								TextString[nstate] <> "-" <> TextString[pstate]];
+								"point rejected (gradienttoohigh) -" <>
+								TextString[npoint] <> "-" <> TextString[ppoint]];
 							rejectedCounterGrad += 1;
 						];
 					,
 						log[logger,
-							"state rejected (valuetoohigh) -" <>
-							TextString[func[nstate]] <> "-" <> TextString[nstate] <> "-" <> TextString[pstate]];
+							"point rejected (valuetoohigh) -" <>
+							TextString[func[npoint]] <> "-" <> TextString[npoint] <> "-" <> TextString[ppoint]];
 						rejectedCounterVal += 1;
 					];
 				,
 					log[logger,
-						"state rejected (back) -" <>
-						TextString[nstate] <> "-" <> TextString[pstate]];
+						"point rejected (back) -" <>
+						TextString[npoint] <> "-" <> TextString[ppoint]];
 				];
 
 			(*otherwise*)
@@ -302,13 +302,13 @@ Begin["`Private`"];
 		];
 
 
-	QGradientTooHigh[state_,dirs_]:= (* [state] *)
+	QGradientTooHigh[point_,dirs_]:= (* [point] *)
 		Block[{grad, proj},
 			
 			(* perform check only if gradtolfactor is finite *)
 			If[gradtolfactor < \[Infinity],
 				
-				grad = NGradient[func, state];
+				grad = NGradient[func, point];
 	
 				If[Norm[grad] < gradtolfactor,
 					Return[False];
@@ -323,13 +323,13 @@ Begin["`Private`"];
 		];
 
 
-	QValueTooHigh[nstate_]:=
+	QValueTooHigh[npoint_]:=
 		Block[{},
 			
 			(* perform check only if maxval is finite *)
 			If[maxval < \[Infinity],
 				
-				If[Abs[func[nstate]] < maxval,
+				If[Abs[func[npoint]] < maxval,
 					Return[False];
 				,
 					Return[True];
@@ -342,12 +342,12 @@ Begin["`Private`"];
 
 
 	(* Are we going back again? *)
-	QBack[pstate_,nstate_]:= (* [paststate, currentstate, dir] *)
+	QBack[ppoint_,npoint_]:= (* [pastpoint, currentpoint, dir] *)
 		Block[{},
 
 			(* TODO: check if this makes sense in all poss. configs *)
 
-			If[Norm[nstate-pstate] < step*0.7,
+			If[Norm[npoint-ppoint] < step*0.7,
 				Return[True];
 			,(*else*)
 				Return[False];
@@ -356,12 +356,12 @@ Begin["`Private`"];
 		];
 
 
-	QNearStatesFull[state_]:= (* [state] *)
+	QNearPoints[point_]:= (* [point] *)
 		Block[{near},
 
-			near = Nearest[states,state][[1]];
+			near = Nearest[pointlist,point][[1]];
 
-			If[Norm[state-near] < step*0.7,
+			If[Norm[point-near] < step*0.7,
 				Return[True];
 			,
 				Return[False];
