@@ -345,17 +345,7 @@ Begin["`Private`"];
 
 	(* Are we going back again? *)
 	QBack[ppoint_,npoint_]:= (* [pastpoint, newpoint] *)
-		Block[{},
-
-			(* TODO: check if this makes sense in all poss. configs *)
-
-			If[Norm[npoint-ppoint] < step*0.7,
-				Return[True];
-			,(*else*)
-				Return[False];
-			];
-
-		];
+		Norm[npoint-ppoint] < step*0.7;		(* TODO: check if this makes sense in all poss. configs *)
 
 
 	QNearPoints[point_]:= (* [point] *)
