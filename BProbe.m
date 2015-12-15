@@ -129,17 +129,12 @@ Begin["`Private`"];
 	Options[ProbeScan] = Options[BProbe`Scan`start];
 	ProbeScan[bdim_?IntegerQ /; bdim > 0, stepsize_?NumericQ /; stepsize > 0,
 		opts:OptionsPattern[]
-	] := Block[{result},
+	] := Block[{},
 	
-		result = BProbe`Scan`start[bdim, stepsize,
+		BProbe`Scan`start[bdim, stepsize,
 			FilterRules[{opts}, Options[BProbe`Scan`start]]
 		];
-		
-		(*
-		Return[result];
-		*)
-		(* forget about the result, it can be fetched with ProbeGetPointList[] anyway *)
-		Return[];
+
 	];
 	
 	ProbeGetPointList[] := Block[{},

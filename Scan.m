@@ -166,7 +166,6 @@ Begin["`Private`"];
 			
 
 			close[logger];
-			Return[pointlist];
 		];
 
 
