@@ -49,7 +49,7 @@ Begin["`Private`"];
 
 
 	Options[ProbeInit] = Options[BProbe`Scan`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
-	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,dim,n,m,expr,i,gamma},
+	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,x,dim,n,m,expr,i,gamma},
 		
 		dim = Length[t];				(* dimension of target space *)
 		n = Length[t[[1]]];				(* n times n matrices *)
@@ -82,10 +82,17 @@ Begin["`Private`"];
 			m = m.m;
 		];
 		
-		(* compile it for (a lot) better performance *)
+		(* compile the operator for (a lot) better performance *)
 		expr = Simplify[ComplexExpand[m], Element[p, Reals]];
 		cm = Compile @@ {DeleteCases[p,0], expr};
-		func[x_] := Abs[Eigenvalues[cm @@ N[x], -1][[1]]];	(* define function to be quasi-minimized *)
+		func[x_] := Abs[Eigenvalues[cm @@ N[x], -1][[1]]];	(* define the function to be quasi-minimized *)
+		
+		(* compile expectation value of state *)
+		x = Table[Unique["x"], n];
+		expr = Simplify[ComplexExpand[
+			(Conjugate[x].#.x)& /@ t
+		]];
+		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr}
 		
 		BProbe`Scan`init[func, DeleteCases[p,0], FilterRules[{opts}, Options[BProbe`Scan`init]]];
 
