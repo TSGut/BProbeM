@@ -239,10 +239,6 @@ Begin["`Private`"];
 		];
 
 
-	norm[point_]:= (* [point] *)
-		point/Norm[point]
-
-
 	QValidDirection[ppoint_,cpoint_,dir_,dirs_]:= (* [pastpoint, currentpoint, direction] *)
 		Block[{npoint},
 			npoint = cpoint + dir;
