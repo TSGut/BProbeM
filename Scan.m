@@ -90,7 +90,7 @@ Begin["`Private`"];
 	getlist[] := Return[pointlist];
 
 
-	Options[start] = {MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], LogFile->""}
+	Options[start] = {MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, LogFile->""}
 	start[numberld_, ssize_, opts:OptionsPattern[]] := (* [number of directions, step qsize] *)
 		Block[{ppoint, cpoint, npoints, minpos, m, i},
 		
@@ -217,8 +217,11 @@ Begin["`Private`"];
 				];
 			];
 			
+			(* if not deactivated *)
 			(* replace points by their corresponding expectation values *)
-			manpoints = expvfunc[#]& /@ npoints;
+			If[opts[ReplacePoints],
+				manpoints = expvfunc[#]& /@ npoints;
+			];
 			
 			
 			Return[manpoints];
