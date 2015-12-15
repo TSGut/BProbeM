@@ -199,15 +199,15 @@ Begin["`Private`"];
 
 
 	manipulatePoints[npoints_] :=
-		Block[{nnpoints, i, p, f2, s},
+		Block[{manpoints, i, p, f2, s},
 			
-			nnpoints = npoints;
+		manpoints = npoints;
 		
 			(* if the surface is a minimum, we can apply *)
 			(* FindMinimum to get a better approximation *)		
 			If[minsurf,
 			
-				nnpoints = {};
+			manpoints = {};
 			
 				f2[p__?NumericQ] := func[{p}];
 				p = Table[Unique["p"], {Length[npoints[[1]]]}];
@@ -218,11 +218,15 @@ Begin["`Private`"];
 					(* , MaxIterations->5 *)
 					
 					(* processed = ReplacePart[processed, i -> ((p /. s[[2]]) - point)]; *)
-					AppendTo[nnpoints, (p /. s[[2]])];
+					AppendTo[manpoints, (p /. s[[2]])];
 				];
 			];
 			
-			Return[nnpoints];
+			(* replace points by their corresponding expectation values *)
+			manpoints = expvfunc[#]& /@ npoints;
+			
+			
+			Return[manpoints];
 			
 		];
 
