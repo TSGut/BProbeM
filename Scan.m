@@ -84,6 +84,9 @@ Begin["`Private`"];
 			rejectedCounterGrad = 0;
 			rejectedCounterVal = 0;
 			rejectedCounterRat = 0;
+			maxFuncValTracker = 0;
+			maxEVRatioTracker = 0;
+			maxGradientTracker = 0;
 	];
 	
 	
@@ -138,20 +141,23 @@ Begin["`Private`"];
 			
 				Refresh[Block[{status},
 					status = {
-						{ "Total points gathered" , TextString[Length[pointlist]] },
-						{ "Points in queue" , TextString[size[boundary]] }
+						{ "Total points gathered" , Length[pointlist] },
+						{ "Points in queue" , size[boundary] },
+						{ "Max occured EV-Ratio" , maxEVRatioTracker },
+						{ "Max occured energy value" , maxFuncValTracker },
+						{ "Max occured gradient" , maxGradientTracker }
 					};
-						
+					
 					If[OptionValue[MaxEVRatio] < \[Infinity],
-						AppendTo[status, {"Rejected pts (EVRatio)" , TextString[rejectedCounterRat] }];
+						AppendTo[status, {"Rejected pts (EVRatio)" , rejectedCounterRat }];
 					];
 					
 					If[OptionValue[MaxFunctionValue] < \[Infinity],
-						AppendTo[status, { "Rejected pts (FuncValue)" , TextString[rejectedCounterVal] }];
+						AppendTo[status, { "Rejected pts (FuncValue)" , rejectedCounterVal }];
 					];
 					
 					If[OptionValue[MaxGradient] < \[Infinity],
-						AppendTo[status, { "Rejected pts (Gradient)" , TextString[rejectedCounterGrad] }];
+						AppendTo[status, { "Rejected pts (Gradient)" , rejectedCounterGrad }];
 					];
 					
 					Panel[TextGrid[
@@ -310,12 +316,17 @@ Begin["`Private`"];
 	QEVRatioTooHigh[nhess_] := (* [hesse matrix] *)
 		Block[{evs, ratio},
 		
+			(* test *)
+			evs = Eigenvalues[nhess, -(numberldirs+1)];
+			ratio = evs[[2]]/evs[[1]];
+			
+			If[ratio > maxEVRatioTracker, maxEVRatioTracker = ratio];
+		
 		
 			(* perform check only if evratio is finite *)
 			If[opts[MaxEVRatio] < \[Infinity],
 		
-				evs = Eigenvalues[nhess, -(numberldirs+1)];
-				ratio = evs[[2]]/evs[[1]];
+
 			
 				If[ratio < opts[MaxEVRatio],
 					Return[False];	
@@ -333,11 +344,16 @@ Begin["`Private`"];
 	QGradientTooHigh[point_]:= (* [point] *)
 		Block[{grad},
 			
+			(* test *)
+			grad = NGradient[func, point];
+			
+			If[Norm[grad] > maxGradientTracker, maxGradientTracker = Norm[grad]];
+			
+		
 			(* perform check only if opts[MaxGradient] is finite *)
 			If[opts[MaxGradient] < \[Infinity],
 				
-				grad = NGradient[func, point];
-	
+				
 				If[Norm[grad] < opts[MaxGradient],
 					Return[False];
 				,
@@ -352,12 +368,17 @@ Begin["`Private`"];
 
 
 	QValueTooHigh[point_]:=
-		Block[{},
+		Block[{val},
 			
+			val = Abs[func[point]];
+		
+			(* test *)
+			If[val > maxFuncValTracker, maxFuncValTracker = val];
+		
 			(* perform check only if opts[MaxFunctionValue] is finite *)
 			If[opts[MaxFunctionValue] < \[Infinity],
 				
-				If[Abs[func[point]] < opts[MaxFunctionValue],
+				If[val < opts[MaxFunctionValue],
 					Return[False];
 				,
 					Return[True];
@@ -388,7 +409,6 @@ Begin["`Private`"];
 		];
 		
 	opts[symbol_] := OptionValue[start, startOptions, symbol];
-
 
 
 
