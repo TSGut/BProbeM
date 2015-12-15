@@ -137,41 +137,15 @@ Begin["`Private`"];
 				
 			];
 			
-			,	(* status message *)
-			
-				Refresh[Block[{status},
-					status = {
-						{ "Total points gathered" , Length[pointlist] },
-						{ "Points in queue" , size[boundary] },
-						{ "Max occured EV-Ratio" , maxEVRatioTracker },
-						{ "Max occured energy value" , maxFuncValTracker },
-						{ "Max occured gradient" , maxGradientTracker }
-					};
-					
-					If[OptionValue[MaxEVRatio] < \[Infinity],
-						AppendTo[status, {"Rejected pts (EVRatio)" , rejectedCounterRat }];
-					];
-					
-					If[OptionValue[MaxFunctionValue] < \[Infinity],
-						AppendTo[status, { "Rejected pts (FuncValue)" , rejectedCounterVal }];
-					];
-					
-					If[OptionValue[MaxGradient] < \[Infinity],
-						AppendTo[status, { "Rejected pts (Gradient)" , rejectedCounterGrad }];
-					];
-					
-					Panel[TextGrid[
-						status,
-						Dividers -> Center,
-						Alignment -> {{Left,Right}},
-						Spacings -> {3,2}
-					]]
-				]
-				, UpdateInterval -> 0.3, TrackedSymbols->{}]
+			,	
+				(* status message *)
+				Refresh[ generateStatus[] , UpdateInterval -> 0.3, TrackedSymbols->{}]
 			];
 			
-
 			close[logger];
+			
+			(* print it out again, so it doesnt just vanish *)
+			Print[generateStatus[]];
 		];
 
 
@@ -409,6 +383,36 @@ Begin["`Private`"];
 		];
 		
 	opts[symbol_] := OptionValue[start, startOptions, symbol];
+	
+	generateStatus[] :=
+		Block[{status},
+			status = {
+				{ "Total points gathered" , Length[pointlist] },
+				{ "Points in queue" , size[boundary] },
+				{ "Max occured EV-Ratio" , maxEVRatioTracker },
+				{ "Max occured energy value" , maxFuncValTracker },
+				{ "Max occured gradient" , maxGradientTracker }
+			};
+			
+			If[opts[MaxEVRatio] < \[Infinity],
+				AppendTo[status, {"Rejected pts (EVRatio)" , rejectedCounterRat }];
+			];
+			
+			If[opts[MaxFunctionValue] < \[Infinity],
+				AppendTo[status, { "Rejected pts (FuncValue)" , rejectedCounterVal }];
+			];
+			
+			If[opts[MaxGradient] < \[Infinity],
+				AppendTo[status, { "Rejected pts (Gradient)" , rejectedCounterGrad }];
+			];
+			
+			Panel[TextGrid[
+				status,
+				Dividers -> Center,
+				Alignment -> {{Left,Right}},
+				Spacings -> {3,2}
+			]]
+		];
 
 
 
