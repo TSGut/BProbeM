@@ -59,6 +59,7 @@ Begin["`Private`"];
 			p[[Complement[Range[dim],OptionValue[Subspace]]]] = 0;
 		];
 		
+		(* build appropriate operator/matrix *)
 		Switch[OptionValue[Probe],
 		
 		"Laplace",
@@ -81,9 +82,10 @@ Begin["`Private`"];
 			m = m.m;
 		];
 		
+		(* compile it for (a lot) better performance *)
 		expr = Simplify[ComplexExpand[m], Element[p, Reals]];
 		cm = Compile @@ {DeleteCases[p,0], expr};
-		func[x_] := Abs[Eigenvalues[cm @@ N[x], -1][[1]]];
+		func[x_] := Abs[Eigenvalues[cm @@ N[x], -1][[1]]];	(* define function to be quasi-minimized *)
 		
 		BProbe`Scan`init[func, DeleteCases[p,0], FilterRules[{opts}, Options[BProbe`Scan`init]]];
 
