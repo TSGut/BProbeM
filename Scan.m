@@ -154,19 +154,21 @@ Begin["`Private`"];
 		Block[{npoints,dirs},
 		
 			dirs = determineDirections[cpoint];
-			dirs = processDirections[cpoint, dirs*step];
-			dirs = filterDirections[ppoint, cpoint, dirs];
-
-			npoints = (cpoint + #)& /@ dirs;
+			
+			npoints = (cpoint + #*step)& /@ dirs;
+			npoints = manipulatePoints[ npoints ];
+			npoints = filterPoints[ppoint, npoints];
 
 			Return[npoints];
 		];
 
+		
+		
 
 (* PRIVATE METHODS (informal) *)
 
 	determineDirections[point_]:= (* [point, tolerance] *)
-		Block[{nhess, directions},
+		Block[{nhess, directions, processed},
 			
 			nhess = NHessian[func, point, Scale -> step/10];
 			
@@ -180,57 +182,61 @@ Begin["`Private`"];
 				Return[{}];
 			];
 			
-			
+			(* directions from Hessian *)
 			directions = Eigensystem[nhess, -numberldirs][[2]];
-
-			Return[directions];
-		];
-
-
-	processDirections[point_,directions_] :=
-		Block[{processed, i, npoint, p, f2, s},
 			
+			
+			(* double them (forward, backward) *)
 			processed = {};
-			
 			For[i=1, i<=Length[directions], i++,
 				AppendTo[processed, directions[[i]]];
 				AppendTo[processed, -directions[[i]]];
 			];
+			
+			
+			Return[processed];
+		];
 
 
-		(* if the surface is a minimum, we can apply FindMinimum to get a better approximation *)		
+	manipulatePoints[npoints_] :=
+		Block[{nnpoints, i, p, f2, s},
+			
+			nnpoints = npoints;
+		
+			(* if the surface is a minimum, we can apply *)
+			(* FindMinimum to get a better approximation *)		
 			If[minsurf,
 			
+				nnpoints = {};
+			
 				f2[p__?NumericQ] := func[{p}];
-				For[i=1, i<=Length[processed], i++,
-					
-					npoint = point + processed[[i]];
-					p = Table[Unique["p"], {Length[point]}];
+				p = Table[Unique["p"], {Length[npoints[[1]]]}];
 				
-					Quiet[s = FindMinimum[f2 @@ p, Thread[{p,npoint}]]];
+				For[i=1, i<=Length[npoints], i++,
+					
+					Quiet[s = FindMinimum[f2 @@ p, Thread[{p,npoints[[i]]}]]];
 					(* , MaxIterations->5 *)
 					
-					processed = ReplacePart[processed, i -> ((p /. s[[2]]) - point)];
-				
+					(* processed = ReplacePart[processed, i -> ((p /. s[[2]]) - point)]; *)
+					AppendTo[nnpoints, (p /. s[[2]])];
 				];
 			];
 			
-
-			Return[processed];
+			Return[nnpoints];
 			
 		];
 
 
-	filterDirections[ppoint_,cpoint_,directions_] := (* [pastpoint, currentpoint, directions] *)
+	filterPoints[ppoint_,npoints_] := (* [pastpoint, newpoints] *)
 		Block[{filtered, i},
 
 			filtered = {};
 
-			For[i=1, i<=Length[directions], i++, (* for each direction *)
+			For[i=1, i<=Length[npoints], i++,
 
-				If[QValidDirection[ppoint, cpoint, directions[[i]], directions],
+				If[QValidPoint[ppoint, npoints[[i]]],
 					(* add *)
-					AppendTo[filtered, directions[[i]]];
+					AppendTo[filtered, npoints[[i]]];
 				];
 
 			];
@@ -239,13 +245,12 @@ Begin["`Private`"];
 		];
 
 
-	QValidDirection[ppoint_,cpoint_,dir_,dirs_]:= (* [pastpoint, currentpoint, direction] *)
-		Block[{npoint},
-			npoint = cpoint + dir;
+	QValidPoint[ppoint_,npoint_]:= (* [pastpoint, newpoint] *)
+		Block[{},
 
 				If[Not[QBack[ppoint, npoint]],
 					If[Not[QValueTooHigh[npoint]],
-						If[Not[QGradientTooHigh[npoint,dirs]],
+						If[Not[QGradientTooHigh[npoint]],
 							If[Not[QNearPoints[npoint]],
 								Return[True];
 							,
@@ -299,8 +304,8 @@ Begin["`Private`"];
 		];
 
 
-	QGradientTooHigh[point_,dirs_]:= (* [point] *)
-		Block[{grad, proj},
+	QGradientTooHigh[point_]:= (* [point] *)
+		Block[{grad},
 			
 			(* perform check only if gradtolfactor is finite *)
 			If[gradtolfactor < \[Infinity],
@@ -320,13 +325,13 @@ Begin["`Private`"];
 		];
 
 
-	QValueTooHigh[npoint_]:=
+	QValueTooHigh[point_]:=
 		Block[{},
 			
 			(* perform check only if maxval is finite *)
 			If[maxval < \[Infinity],
 				
-				If[Abs[func[npoint]] < maxval,
+				If[Abs[func[point]] < maxval,
 					Return[False];
 				,
 					Return[True];
@@ -339,7 +344,7 @@ Begin["`Private`"];
 
 
 	(* Are we going back again? *)
-	QBack[ppoint_,npoint_]:= (* [pastpoint, currentpoint, dir] *)
+	QBack[ppoint_,npoint_]:= (* [pastpoint, newpoint] *)
 		Block[{},
 
 			(* TODO: check if this makes sense in all poss. configs *)
