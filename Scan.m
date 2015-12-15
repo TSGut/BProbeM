@@ -93,7 +93,7 @@ Begin["`Private`"];
 	getlist[] := Return[pointlist];
 
 
-	Options[start] = {MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, LogFile->""}
+	Options[start] = {MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, UpdateInterval->0.1, LogFile->""}
 	start[numberld_, ssize_, opts:OptionsPattern[]] := (* [number of directions, step qsize] *)
 		Block[{ppoint, cpoint, npoints, minpos, m, i},
 		
@@ -139,7 +139,7 @@ Begin["`Private`"];
 			
 			,	
 				(* status message *)
-				Refresh[ generateStatus[] , UpdateInterval -> 0.3, TrackedSymbols->{}]
+				Refresh[ generateStatus[], TrackedSymbols->{}, FilterRules[Options[start], Options[Refresh]]]
 			];
 			
 			close[logger];
