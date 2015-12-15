@@ -91,19 +91,15 @@ Begin["`Private`"];
 
 
 	Options[start] = {MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], LogFile->""}
-	start[numberld_, ssize_, OptionsPattern[]] := (* [number of directions, step qsize] *)
+	start[numberld_, ssize_, opts:OptionsPattern[]] := (* [number of directions, step qsize] *)
 		Block[{ppoint, cpoint, npoints, minpos, m, i},
-
+		
 			step = ssize;
 			numberldirs = numberld;
-
-			minsurf = OptionValue[MinimalSurface];
-			maxevratio = OptionValue[MaxEVRatio];
-			maxval = OptionValue[MaxFunctionValue];
-			gradtolfactor = OptionValue[MaxGradient];
-
-
-
+			
+			startOptions = opts;
+			
+			
 			(* init call is necessary! *)
 			If[inited==False,
 				Message["First call Walk`init with appropriate parameters ... "];
@@ -200,14 +196,14 @@ Begin["`Private`"];
 	manipulatePoints[npoints_] :=
 		Block[{manpoints, i, p, f2, s},
 			
-		manpoints = npoints;
+			manpoints = npoints;
 		
 			(* if the surface is a minimum, we can apply *)
 			(* FindMinimum to get a better approximation *)		
-			If[minsurf,
+			If[opts[MinimalSurface],
 			
-			manpoints = {};
-			
+				manpoints = {};
+				
 				f2[p__?NumericQ] := func[{p}];
 				p = Table[Unique["p"], {Length[npoints[[1]]]}];
 				
@@ -289,12 +285,12 @@ Begin["`Private`"];
 		
 		
 			(* perform check only if evratio is finite *)
-			If[maxevratio < \[Infinity],
+			If[opts[MaxEVRatio] < \[Infinity],
 		
 				evs = Eigenvalues[nhess, -(numberldirs+1)];
 				ratio = evs[[2]]/evs[[1]];
 			
-				If[ratio < maxevratio,
+				If[ratio < opts[MaxEVRatio],
 					Return[False];	
 				,
 					Return[True];
@@ -310,12 +306,12 @@ Begin["`Private`"];
 	QGradientTooHigh[point_]:= (* [point] *)
 		Block[{grad},
 			
-			(* perform check only if gradtolfactor is finite *)
-			If[gradtolfactor < \[Infinity],
+			(* perform check only if opts[MaxGradient] is finite *)
+			If[opts[MaxGradient] < \[Infinity],
 				
 				grad = NGradient[func, point];
 	
-				If[Norm[grad] < gradtolfactor,
+				If[Norm[grad] < opts[MaxGradient],
 					Return[False];
 				,
 					Return[True];
@@ -331,10 +327,10 @@ Begin["`Private`"];
 	QValueTooHigh[point_]:=
 		Block[{},
 			
-			(* perform check only if maxval is finite *)
-			If[maxval < \[Infinity],
+			(* perform check only if opts[MaxFunctionValue] is finite *)
+			If[opts[MaxFunctionValue] < \[Infinity],
 				
-				If[Abs[func[point]] < maxval,
+				If[Abs[func[point]] < opts[MaxFunctionValue],
 					Return[False];
 				,
 					Return[True];
@@ -363,6 +359,10 @@ Begin["`Private`"];
 			];
 
 		];
+		
+	opts[symbol_] := OptionValue[start, startOptions, symbol];
+
+
 
 
 Options[NHessian]={Scale->10^-3};
