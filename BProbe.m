@@ -89,12 +89,14 @@ Begin["`Private`"];
 		
 		(* compile expectation value of state *)
 		x = Table[Unique["x"], n];
-		expr = Simplify[ComplexExpand[
-			(Conjugate[x].#.x)& /@ t
-		]];
-		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr}
-		
-		BProbe`Scan`init[func, DeleteCases[p,0], FilterRules[{opts}, Options[BProbe`Scan`init]]];
+		expr = Simplify[ (Conjugate[x].#.x)& /@ t[[OptionValue[Subspace]]] ];
+		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr};
+		expf[x_] := Block[{state},
+			state = Eigenvectors[cm @@ N[x], -1][[1]];
+			Return[Re[cexp @@ state]]; (* they should be real (always ?! todo) *)
+		];
+
+		BProbe`Scan`init[func, expf, DeleteCases[p,0], FilterRules[{opts}, Options[BProbe`Scan`init]]];
 
 	];
 	

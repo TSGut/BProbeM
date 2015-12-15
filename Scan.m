@@ -39,10 +39,11 @@ Begin["`Private`"];
 
 
 	Options[init] = {StartingPoint -> "min"}
-	init[f_,x_, opts:OptionsPattern[]] :=
+	init[f_, exp_, x_, opts:OptionsPattern[]] :=
 		Block[{s,f2},
 
 			func = f;
+			expvfunc = exp;
 
 			If[!ListQ[OptionValue[StartingPoint]],
 
