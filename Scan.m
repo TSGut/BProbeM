@@ -357,7 +357,7 @@ Begin["`Private`"];
 
 			near = Nearest[pointlist,point][[1]];
 
-			If[Norm[point-near] < step*0.7,
+			If[Norm[point-near] < step*0.3,
 				Return[True];
 			,
 				Return[False];
