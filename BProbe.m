@@ -126,17 +126,12 @@ Begin["`Private`"];
 		
 	];
 
-	Options[ProbeScan] = Options[BProbe`Scan`start] ~Join~ {MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], LogFile->""};
-
+	Options[ProbeScan] = Options[BProbe`Scan`start];
 	ProbeScan[bdim_?IntegerQ /; bdim > 0, stepsize_?NumericQ /; stepsize > 0,
 		opts:OptionsPattern[]
 	] := Block[{result},
 	
 		result = BProbe`Scan`start[bdim, stepsize,
-			OptionValue[MaxFunctionValue],
-			OptionValue[MaxEVRatio],
-			OptionValue[MaxGradient],
-			OptionValue[LogFile],
 			FilterRules[{opts}, Options[BProbe`Scan`start]]
 		];
 		

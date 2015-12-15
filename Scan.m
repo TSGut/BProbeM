@@ -90,18 +90,17 @@ Begin["`Private`"];
 	getlist[] := Return[pointlist];
 
 
-	Options[start] = {MinimalSurface -> False}
-	start[numberld_, ssize_, maxv_, maxevr_, gradtolf_, logfilename_, OptionsPattern[]] := 
-		(* [number of directions, step size, tol factor for function value, ratio tol factor, tol factor for gradient, filename of log file] *)
+	Options[start] = {MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], LogFile->""}
+	start[numberld_, ssize_, OptionsPattern[]] := (* [number of directions, step qsize] *)
 		Block[{ppoint, cpoint, npoints, minpos, m, i},
 
 			step = ssize;
 			numberldirs = numberld;
 
 			minsurf = OptionValue[MinimalSurface];
-			maxevratio = maxevr;
-			maxval = maxv;
-			gradtolfactor = gradtolf;
+			maxevratio = OptionValue[MaxEVRatio];
+			maxval = OptionValue[MaxFunctionValue];
+			gradtolfactor = OptionValue[MaxGradient];
 
 
 
@@ -111,7 +110,7 @@ Begin["`Private`"];
 				Abort[];
 			];
 
-			logger = new[Logger,logfilename];			
+			logger = new[Logger, OptionValue[LogFile]];
 
 
 			cpoint = Last[pointlist];
