@@ -215,4 +215,4 @@ End[];
 
 EndPackage[];
 
-Print["Successfully loaded BProbe. See the " <> BProbe`Private`link["index", "documentation"] <> " for help."];
+Print["Loaded BProbe. See the " <> BProbe`Private`link["index", "documentation"] <> " for help."];
