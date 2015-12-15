@@ -23,7 +23,7 @@
 
 
 
-BeginPackage["BProbe`Walk`"];
+BeginPackage["BProbe`Scan`"];
 
 	(* we don't need to expose this, since the user doesn't see it anyhow *)
 	init::usage="init";

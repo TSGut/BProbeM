@@ -42,13 +42,13 @@ BeginPackage["BProbe`"];
 
 
 Begin["`Private`"];
-	Get[ "BProbe`Walk`" ];
+	Get[ "BProbe`Scan`" ];
 	Get[ "BProbe`Gamma`" ];
 	Get[ "BProbe`SU2Gen`" ];
 	Get[ "BProbe`SU3Gen`" ];
 
 
-	Options[ProbeInit] = Options[BProbe`Walk`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
+	Options[ProbeInit] = Options[BProbe`Scan`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
 	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,dim,n,m,expr,i,gamma},
 		
 		dim = Length[t];				(* dimension of target space *)
@@ -85,29 +85,29 @@ Begin["`Private`"];
 		cm = Compile @@ {DeleteCases[p,0], expr};
 		func[x_] := Abs[Eigenvalues[cm @@ N[x], -1][[1]]];
 		
-		BProbe`Walk`init[func, DeleteCases[p,0], FilterRules[{opts}, Options[BProbe`Walk`init]]];
+		BProbe`Scan`init[func, DeleteCases[p,0], FilterRules[{opts}, Options[BProbe`Scan`init]]];
 
 	];
 	
-	Options[ProbeReset] = Options[BProbe`Walk`reset];
+	Options[ProbeReset] = Options[BProbe`Scan`reset];
 	ProbeReset[opts:OptionsPattern[]] := Block[{},
 		
-		BProbe`Walk`reset[opts];
+		BProbe`Scan`reset[opts];
 		
 	];
 
-	Options[ProbeScan] = Options[BProbe`Walk`start] ~Join~ {MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], LogFile->""};
+	Options[ProbeScan] = Options[BProbe`Scan`start] ~Join~ {MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], LogFile->""};
 
 	ProbeScan[bdim_?IntegerQ /; bdim > 0, stepsize_?NumericQ /; stepsize > 0,
 		opts:OptionsPattern[]
 	] := Block[{result},
 	
-		result = BProbe`Walk`start[bdim, stepsize,
+		result = BProbe`Scan`start[bdim, stepsize,
 			OptionValue[MaxFunctionValue],
 			OptionValue[MaxEVRatio],
 			OptionValue[MaxGradient],
 			OptionValue[LogFile],
-			FilterRules[{opts}, Options[BProbe`Walk`start]]
+			FilterRules[{opts}, Options[BProbe`Scan`start]]
 		];
 		
 		(*
@@ -118,7 +118,7 @@ Begin["`Private`"];
 	];
 	
 	ProbeGetPointList[] := Block[{},
-		Return[BProbe`Walk`getlist[]];
+		Return[BProbe`Scan`getlist[]];
 	];
 	
 	ProbeGetMinEigenvalue[p_?(VectorQ[#,NumericQ]&)] := Block[{},
