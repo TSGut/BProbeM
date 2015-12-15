@@ -114,31 +114,56 @@ Begin["`Private`"];
 
 
 			(* CORE *)
-			Monitor[Monitor[Monitor[Monitor[Monitor[
+			Monitor[
 			While[boundary.size[] != 0,
 				{ppoint, cpoint} = boundary.pop[];
-
-
+				
+				
 				npoints = doStep[ppoint, cpoint];
-
+				
 				(* append new points, boundary info  + ppoints *)
 				boundary.pushList[Thread[{
 					Table[cpoint,{Length[npoints]}] ,
 					npoints
 				}]];
 				pointlist = Join[pointlist, npoints];
-
+				
 				log[logger,
 					"point accepted -" <> TextString[#]
 				]& /@ npoints;
-
+				
 			];
-			, "Points at boundary: " <> TextString[size[boundary]]]
-			, "Rejected points (Gradient): " <> TextString[rejectedCounterGrad]]
-			, "Rejected points (FuncValue): " <> TextString[rejectedCounterVal]]
-			, "Rejected points (EVRatio): " <> TextString[rejectedCounterRat]]
-			, "Added points: " <> TextString[Length[pointlist]]];
-
+			
+			,	(* status message *)
+			
+				Refresh[Block[{status},
+					status = {
+						{ "Total points gathered" , TextString[Length[pointlist]] },
+						{ "Points in queue" , TextString[size[boundary]] }
+					};
+						
+					If[OptionValue[MaxEVRatio] < \[Infinity],
+						AppendTo[status, {"Rejected pts (EVRatio)" , TextString[rejectedCounterRat] }];
+					];
+					
+					If[OptionValue[MaxFunctionValue] < \[Infinity],
+						AppendTo[status, { "Rejected pts (FuncValue)" , TextString[rejectedCounterVal] }];
+					];
+					
+					If[OptionValue[MaxGradient] < \[Infinity],
+						AppendTo[status, { "Rejected pts (Gradient)" , TextString[rejectedCounterGrad] }];
+					];
+					
+					Panel[TextGrid[
+						status,
+						Dividers -> Center,
+						Alignment -> {{Left,Right}},
+						Spacings -> {3,2}
+					]]
+				]
+				, UpdateInterval -> 0.3, TrackedSymbols->{}]
+			];
+			
 
 			close[logger];
 			Return[pointlist];
