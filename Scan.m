@@ -410,8 +410,9 @@ Begin["`Private`"];
 				status,
 				Dividers -> Center,
 				Alignment -> {{Left,Right}},
-				Spacings -> {3,2}
-			]]
+				Spacings -> {3,2},
+				ItemSize -> {{Fit, Automatic}}
+			], "Status Information", ImageSize->Full]
 		];
 
 
