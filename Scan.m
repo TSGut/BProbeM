@@ -40,14 +40,14 @@ Begin["`Private`"];
 
 	Options[init] = {StartingPoint -> "min"}
 	init[f_, exp_, x_, opts:OptionsPattern[]] :=
-		Block[{s,f2},
+		Block[{s, f2, info},
 
 			func = f;
 			expvfunc = exp;
 
 			If[!ListQ[OptionValue[StartingPoint]],
-
-				Print["Look for global minimum ..."];
+				
+				PrintTemporary["Look for global minimum of energy displacement ..."];
 				f2[p__?NumericQ] := Abs[func[{p}]];
 				s = NMinimize[f2 @@ x,x];
 				startPoint = x /. s[[2]];
@@ -57,12 +57,25 @@ Begin["`Private`"];
 			];
 			
 			reset[opts];
-
-			Print["---"];
-
-			Print["Minimum / Starting point:\n", func[startPoint], " at ", startPoint];
-			Print["Gradient:\n", NGradient[func,startPoint]];
-			Print["Abs Hess. Eigv:\n", Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]]];
+			
+			
+			(* print info *)
+			info = {
+				{ "Energy Minimum Value" , func[startPoint] },
+				{ "Energy Minimum Location", MatrixForm[startPoint] },
+				{ "Gradient" , MatrixForm[NGradient[func,startPoint]] },
+				{ "Abs. Hessian Eigenv.", MatrixForm[Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]]] }
+			};
+			
+			
+			Print[Panel[TextGrid[
+				info,
+				Dividers -> Center,
+				Alignment -> {{Left,Center}},
+				Spacings -> {3,2},
+				ItemSize -> {{Automatic, Fit}}
+			], ImageSize->Full]];
+			
 			
 			inited=True; (* say: okay, we did a initialization *)
 		];
@@ -395,7 +408,7 @@ Begin["`Private`"];
 			};
 			
 			If[opts[MaxEVRatio] < \[Infinity],
-				AppendTo[status, {"Rejected pts (EVRatio)" , rejectedCounterRat }];
+				AppendTo[status, { "Rejected pts (EVRatio)" , rejectedCounterRat }];
 			];
 			
 			If[opts[MaxDisplacementEnergy] < \[Infinity],
@@ -409,9 +422,9 @@ Begin["`Private`"];
 			Panel[TextGrid[
 				status,
 				Dividers -> Center,
-				Alignment -> {{Left,Right}},
+				Alignment -> {{Left,Center}},
 				Spacings -> {3,2},
-				ItemSize -> {{Fit, Automatic}}
+				ItemSize -> {{Automatic, Fit}}
 			], "Status Information", ImageSize->Full]
 		];
 
