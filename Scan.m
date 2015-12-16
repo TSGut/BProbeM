@@ -93,7 +93,7 @@ Begin["`Private`"];
 	getlist[] := Return[pointlist];
 
 
-	Options[start] = {MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxFunctionValue->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, UpdateInterval->0.1, LogFile->""}
+	Options[start] = {MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxDisplacementEnergy->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, UpdateInterval->0.1, LogFile->""}
 	start[numberld_, ssize_, opts:OptionsPattern[]] := (* [number of directions, step qsize] *)
 		Block[{ppoint, cpoint, npoints, minpos, m, i},
 		
@@ -255,7 +255,7 @@ Begin["`Private`"];
 		Block[{},
 
 				If[Not[QBack[ppoint, npoint]],
-					If[Not[QValueTooHigh[npoint]],
+					If[Not[QEnergyTooHigh[npoint]],
 						If[Not[QGradientTooHigh[npoint]],
 							If[Not[QNearPoints[npoint]],
 								Return[True];
@@ -341,7 +341,7 @@ Begin["`Private`"];
 		];
 
 
-	QValueTooHigh[point_]:=
+	QEnergyTooHigh[point_]:=
 		Block[{val},
 			
 			val = Abs[func[point]];
@@ -349,10 +349,10 @@ Begin["`Private`"];
 			(* test *)
 			If[val > maxFuncValTracker, maxFuncValTracker = val];
 		
-			(* perform check only if opts[MaxFunctionValue] is finite *)
-			If[opts[MaxFunctionValue] < \[Infinity],
+			(* perform check only if opts[MaxDisplacementEnergy] is finite *)
+			If[opts[MaxDisplacementEnergy] < \[Infinity],
 				
-				If[val < opts[MaxFunctionValue],
+				If[val < opts[MaxDisplacementEnergy],
 					Return[False];
 				,
 					Return[True];
@@ -390,7 +390,7 @@ Begin["`Private`"];
 				{ "Total points gathered" , Length[pointlist] },
 				{ "Points in queue" , size[boundary] },
 				{ "Max occured EV-Ratio" , maxEVRatioTracker },
-				{ "Max occured energy value" , maxFuncValTracker },
+				{ "Max occured displacement energy" , maxFuncValTracker },
 				{ "Max occured gradient" , maxGradientTracker }
 			};
 			
@@ -398,7 +398,7 @@ Begin["`Private`"];
 				AppendTo[status, {"Rejected pts (EVRatio)" , rejectedCounterRat }];
 			];
 			
-			If[opts[MaxFunctionValue] < \[Infinity],
+			If[opts[MaxDisplacementEnergy] < \[Infinity],
 				AppendTo[status, { "Rejected pts (FuncValue)" , rejectedCounterVal }];
 			];
 			
