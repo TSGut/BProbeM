@@ -40,11 +40,12 @@ Begin["`Private`"];
 
 	Options[init] = {StartingPoint -> "min"}
 	init[f_, exp_, x_, opts:OptionsPattern[]] :=
-		Block[{s, f2, info},
+		Block[{s, f2, info, evlist, i},
 
 			func = f;
 			expvfunc = exp;
 
+			(* automatically determine starting point, if not given *)
 			If[!ListQ[OptionValue[StartingPoint]],
 				
 				PrintTemporary["* Look for global minimum of energy displacement ..."];
@@ -56,18 +57,32 @@ Begin["`Private`"];
 				startPoint = OptionValue[StartingPoint];
 			];
 			
+			(* automatically determine local dimension of brane *)
+			(* i.e. just jack for eigenvalues < some small value *)
+			branedim = 0;
+			evlist = Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]];
+			For[i=1,i<=Length[evlist],i++,
+				If[evlist[[i]] < 0.3,
+					branedim += 1;
+					evlist[[i]] = Style[evlist[[i]], Darker[Green]]; (* and colorize for later *)
+				,
+					evlist[[i]] = Style[evlist[[i]], Darker[Red]];
+				];
+			];
+			
+			
 			reset[opts];
 			
 			inited=True; (* say: okay, we did a initialization *)
 			
 			
-			
 			(* print info *)
 			info = {
 				{ "Starting Point (SP)", MatrixForm[startPoint] },
-				{ "Energy at SP" , func[startPoint] },
-				{ "||Gradient|| at SP" , Norm[NGradient[func,startPoint]] },
-				{ "Abs. Hessian Eigenv. at SP", MatrixForm[Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]]] }
+				{ "Energy at SP" , TextString[func[startPoint]] },
+				{ "Norm of Gradient at SP" , Norm[NGradient[func,startPoint]] },
+				{ "Absolute Hessian Eigenvalues at SP", MatrixForm[evlist] },
+				{ "Local brane dimension", Style[ToString[branedim],{Darker[If[branedim==0,Red,Green]],Bold}] }
 			};
 			
 			Return[info];
