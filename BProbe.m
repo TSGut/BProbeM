@@ -49,7 +49,7 @@ Begin["`Private`"];
 	
 
 	Options[ProbeInit] = Options[BProbe`Scan`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
-	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,x,dim,n,gn,m,expr,eexpr,i,gamma,subspace},
+	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,x,dim,n,gn,m,expr,eexpr,i,gamma,subspace,info},
 		
 		dim = Length[t];				(* dimension of target space *)
 		n = Length[t[[1]]];				(* n times n matrices *)
@@ -111,8 +111,17 @@ Begin["`Private`"];
 			Return[Re[cexp @@ state]]; (* they should be real (always ?! todo) *)
 		];
 
-		BProbe`Scan`init[func, expf, DeleteCases[p,0], FilterRules[{opts}, Options[BProbe`Scan`init]]];
+		
+		info = BProbe`Scan`init[func, expf, DeleteCases[p,0], FilterRules[{opts}, Options[BProbe`Scan`init]]];
+		PrependTo[info,{"Energy Probe", Style[OptionValue[Probe],Bold]}];
 
+		Print[Panel[TextGrid[
+			info,
+			Dividers -> Center,
+			Alignment -> {{Right,Center},Table[Top,Length[info]]},
+			Spacings -> {3,2},
+			ItemSize -> {{Automatic, Automatic}}
+		]]];
 	];
 	
 	Options[ProbeReset] = Options[BProbe`Scan`reset];

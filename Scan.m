@@ -58,26 +58,19 @@ Begin["`Private`"];
 			
 			reset[opts];
 			
+			inited=True; (* say: okay, we did a initialization *)
+			
+			
 			
 			(* print info *)
 			info = {
-				{ "Starting point", MatrixForm[startPoint] },
-				{ "Energy at starting point" , func[startPoint] },
-				{ "||Gradient|| at starting point" , Norm[NGradient[func,startPoint]] },
-				{ "Abs. Hessian Eigenv. at starting point", MatrixForm[Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]]] }
+				{ "Starting Point (SP)", MatrixForm[startPoint] },
+				{ "Energy at SP" , func[startPoint] },
+				{ "||Gradient|| at SP" , Norm[NGradient[func,startPoint]] },
+				{ "Abs. Hessian Eigenv. at SP", MatrixForm[Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]]] }
 			};
 			
-			
-			Print[Panel[TextGrid[
-				info,
-				Dividers -> Center,
-				Alignment -> {{Left,Center}},
-				Spacings -> {3,2},
-				ItemSize -> {{Automatic, Fit}}
-			], ImageSize->Full]];
-			
-			
-			inited=True; (* say: okay, we did a initialization *)
+			Return[info];
 		];
 
 
