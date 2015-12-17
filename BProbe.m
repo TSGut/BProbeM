@@ -22,7 +22,6 @@
 *)
 
 
-
 BeginPackage["BProbe`"];
 
 (* The sole PUBlIC API of this package *)
@@ -37,6 +36,7 @@ BeginPackage["BProbe`"];
 	ProbeGetState::usage = "";
 	MatrixRepSU2::usage = "";
 	MatrixRepSU3::usage = "";
+	RunTests::usage = "";
 (***************************************************************************************)
 (* for usage messages: see the end of this package *)
 
@@ -46,7 +46,7 @@ Begin["`Private`"];
 	Get[ "BProbe`Gamma`" ];
 	Get[ "BProbe`SU2Gen`" ];
 	Get[ "BProbe`SU3Gen`" ];
-
+	
 
 	Options[ProbeInit] = Options[BProbe`Scan`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
 	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,x,dim,n,gn,m,expr,eexpr,i,gamma,subspace},
@@ -164,7 +164,74 @@ Begin["`Private`"];
 	] := Block[{},
 		Return[BProbe`SU3Gen`Private`MatrixRepSU3[list]];
 	];
+	
+	
+	
+	
+	(* runs all Tests specified in ./Tests/ *)
+	(****************************************)
+	RunTests[] := Block[{testdir, filenames, reports, report, i, allsucceeded, testcount, output, ptemp},
+		
+		testcount = 0;
+		allsucceeded=True;
+		testdir = FileNameJoin[{ThisDirectory[], "Tests"}];
+		filenames = FileNames["*Tests.m", {testdir}];
+		
+		
+		PrintTemporary["Running Tests ",ProgressIndicator[Appearance -> "Ellipsis"]];
+		
+		Block[{PrintTemporary,Print},
+			(* deactivate outputs *)
+			Unprotect[PrintTemporary]; PrintTemporary = Null &;
+			Unprotect[Print]; Print = Null &;
+			
+			(* run tests *)
+			reports = TestReport[#]& /@ filenames;
+		
+		]; (* Print and PrintTemporary are usable again at this point *)
 
+		
+		For[i=1,i<=Length[reports],i++,
+		
+			testcount += Length[reports[[i]]["TestResults"]];
+		
+			If[reports[[i]]["AllTestsSucceeded"]==False,
+				allsucceeded=False;
+		
+				report = {
+					{ "Tests failed", Style[reports[[i]]["TestsFailedCount"],{Bold,Red}] },
+					{ "Tests succeeded", Style[reports[[i]]["TestsSucceededCount"],{Bold,Darker[Green]}] },
+					{ "Time elapsed", reports[[i]]["TimeElapsed"] },
+					{ "Failed tests", Union[Values[reports[[i]]["TestsFailed"]]] }
+				};
+			
+				Print[Panel[TextGrid[
+					report,
+					Dividers -> Center,
+					Alignment -> {{Left,Center}},
+					Spacings -> {3,2}
+				], FileBaseName[filenames[[i]]] ]];
+			
+			];
+		
+		];
+		
+		If[!allsucceeded,
+			Print["!!! Warning: Some tests failed !!!"];
+			Return[reports];
+		,
+			Print["All " <> TextString[testcount] <> " tests succeeded."];
+		];
+		
+	];
+	
+	(* Mathematica seems to have the weirdest directory-handling I've ever seen, *)
+	(* so I need this ugly workaround *)
+	ThisDirectory[] = DirectoryName[$InputFileName];
+
+	
+	
+	
 
     (* formatting stuff for usage messages	*)
 	(****************************************)
@@ -211,6 +278,8 @@ End[];
 	MatrixRepSU2::usage = BProbe`Private`header["MatrixRepSU2", {{"Integer", "dimension"}}] <> " returns a " <> BProbe`Private`doc["List"] <> " of three matrices, constituting a specific matrix representation of SU(2) acting on a representation space of the dimension given as argument."
 	
 	MatrixRepSU3::usage = BProbe`Private`header["MatrixRepSU3", {{"List", "highest_weight"}}] <> " returns a " <> BProbe`Private`doc["List"] <> " of eight matrices, constituting a specific matrix representation of SU(3) with highest weight given as argument."
+	
+	RunTests::usage = "Run the Test-Suite.";
 (***************************************************************************************)
 
 EndPackage[];
