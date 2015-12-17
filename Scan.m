@@ -47,7 +47,7 @@ Begin["`Private`"];
 
 			If[!ListQ[OptionValue[StartingPoint]],
 				
-				PrintTemporary["Look for global minimum of energy displacement ..."];
+				PrintTemporary["* Look for global minimum of energy displacement ..."];
 				f2[p__?NumericQ] := Abs[func[{p}]];
 				s = NMinimize[f2 @@ x,x];
 				startPoint = x /. s[[2]];
@@ -61,10 +61,10 @@ Begin["`Private`"];
 			
 			(* print info *)
 			info = {
-				{ "Energy Minimum Value" , func[startPoint] },
-				{ "Energy Minimum Location", MatrixForm[startPoint] },
-				{ "Gradient" , MatrixForm[NGradient[func,startPoint]] },
-				{ "Abs. Hessian Eigenv.", MatrixForm[Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]]] }
+				{ "Starting point", MatrixForm[startPoint] },
+				{ "Energy at starting point" , func[startPoint] },
+				{ "||Gradient|| at starting point" , Norm[NGradient[func,startPoint]] },
+				{ "Abs. Hessian Eigenv. at starting point", MatrixForm[Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]]] }
 			};
 			
 			
