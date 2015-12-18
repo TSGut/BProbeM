@@ -114,12 +114,11 @@ Begin["`Private`"];
 	getlist[] := Return[pointlist];
 
 
-	Options[start] = {MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxDisplacementEnergy->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, UpdateInterval->0.1, LogFile->""}
+	Options[start] = {Dimension -> branedim, MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxDisplacementEnergy->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, UpdateInterval->0.1, LogFile->""}
 	start[numberld_, ssize_, opts:OptionsPattern[]] := (* [number of directions, step qsize] *)
 		Block[{ppoint, cpoint, npoints, minpos, m, i},
 		
 			step = ssize;
-			numberldirs = numberld;
 			
 			startOptions = opts;
 			
@@ -203,7 +202,7 @@ Begin["`Private`"];
 			];
 			
 			(* directions from Hessian *)
-			directions = Eigensystem[nhess, -numberldirs][[2]];
+			directions = Eigensystem[nhess, -opts[Dimension]][[2]];
 			
 			
 			(* double them (forward, backward) *)
@@ -312,7 +311,7 @@ Begin["`Private`"];
 		Block[{evs, ratio},
 		
 			(* test *)
-			evs = Eigenvalues[nhess, -(numberldirs+1)];
+			evs = Eigenvalues[nhess, -(opts[Dimension]+1)];
 			ratio = evs[[2]]/evs[[1]];
 			
 			If[ratio > maxEVRatioTracker, maxEVRatioTracker = ratio];
