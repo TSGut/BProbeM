@@ -8,6 +8,10 @@ VerificationTest[ ProbeScan[2,0.8]
 	, Null
 	, TestID -> "ProbeScan-wo-opts"
 ];
+VerificationTest[ ProbeScan[2,0.8, Dimension->2]
+	, Null
+	, TestID -> "ProbeScan-Dimension"
+];
 VerificationTest[ ProbeScan[2,0.8, ReplacePoints->False, MaxDisplacementEnergy->2.1]
 	, Null
 	, TestID -> "ProbeScan-ReplacePoints"
@@ -46,6 +50,24 @@ VerificationTest[ProbeGetPointList[]
 		For[i=1,i<=Length[list1],i++,
 			If[Norm[list1[[i]]-list2[[i]]] > 10^-6,
 				same = False;
+			];
+		];
+	
+		Return[same];
+	]]
+];
+
+ProbeInit[PauliMatrix[{1,2,3}],StartingPoint->{1,0,0}];
+ProbeScan[2, 0.8, Dimension->1];
+VerificationTest[ProbeGetPointList[]
+	,{{1,0,0},{0.780869,0.,0.624695},{0.780869,0.,-0.624695},{0.219367,0.,0.975642},{0.219367,0.,-0.975642},{-0.437968,-3.74406*10^-15,0.898991},{-0.437968,3.74406*10^-15,-0.898991},{-0.903728,-7.99925*10^-13,0.428108},{-0.903728,-1.24486*10^-12,-0.428108}}
+	, TestID -> "ProbeScan-FuzzySphere-dim-1"
+	, SameTest -> Function[{list1,list2}, Block[{i, same},
+		same = True;
+		
+		For[i=1,i<=Length[list1],i++,
+			If[Norm[list1[[i]]-list2[[i]]] > 10^-6,
+			same = False;
 			];
 		];
 	
