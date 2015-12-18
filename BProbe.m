@@ -132,13 +132,11 @@ Begin["`Private`"];
 	];
 
 	Options[ProbeScan] = Options[BProbe`Scan`start];
-	ProbeScan[bdim_?IntegerQ /; bdim > 0, stepsize_?NumericQ /; stepsize > 0,
-		opts:OptionsPattern[]
-	] := Block[{},
+	ProbeScan[stepsize_?NumericQ /; stepsize > 0, opts:OptionsPattern[]] := Block[{},
 		
 		PrintTemporary["Scanning surface ... ",ProgressIndicator[Appearance -> "Necklace"]];
 		
-		BProbe`Scan`start[bdim, stepsize,
+		BProbe`Scan`start[stepsize,
 			FilterRules[{opts}, Options[BProbe`Scan`start]]
 		];
 

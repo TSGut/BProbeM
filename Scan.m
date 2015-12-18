@@ -115,9 +115,9 @@ Begin["`Private`"];
 
 
 	Options[start] = {Dimension -> branedim, MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxDisplacementEnergy->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, UpdateInterval->0.1, LogFile->""}
-	start[numberld_, ssize_, opts:OptionsPattern[]] := (* [number of directions, step qsize] *)
+	start[ssize_, opts:OptionsPattern[]] := (* [step size] *)
 		Block[{ppoint, cpoint, npoints, minpos, m, i},
-		
+
 			step = ssize;
 			
 			startOptions = opts;
