@@ -220,20 +220,20 @@ Begin["`Private`"];
 			(* if the surface is a minimum, we can apply *)
 			(* FindMinimum to get a better approximation *)		
 			If[opts[MinimalSurface],
-			
-				manpoints = {};
 				
 				f2[p__?NumericQ] := func[{p}];
 				p = Table[Unique["p"], {Length[npoints[[1]]]}];
 				
+				manpoints = Flatten[Reap[
 				For[i=1, i<=Length[npoints], i++,
 					
 					Quiet[s = FindMinimum[f2 @@ p, Thread[{p,npoints[[i]]}]]];
 					(* , MaxIterations->5 *)
 					
 					(* processed = ReplacePart[processed, i -> ((p /. s[[2]]) - point)]; *)
-					AppendTo[manpoints, (p /. s[[2]])];
-				];
+					Sow[(p /. s[[2]])];
+				]
+				][[2]],1];
 			];
 			
 			(* if not deactivated *)
@@ -249,19 +249,12 @@ Begin["`Private`"];
 
 
 	filterPoints[ppoint_,npoints_] := (* [pastpoint, newpoints] *)
-		Block[{filtered, i},
+		Block[{filtered},
 
-			filtered = {};
-
-			For[i=1, i<=Length[npoints], i++,
-
-				If[QValidPoint[ppoint, npoints[[i]]],
-					(* add *)
-					AppendTo[filtered, npoints[[i]]];
-				];
-
-			];
-
+			filtered = Flatten[Reap[
+				(If[QValidPoint[ppoint, #], Sow[#]])& /@ npoints;
+			][[2]],1];
+			
 			Return[filtered];
 		];
 
