@@ -194,7 +194,9 @@ Begin["`Private`"];
 	determineDirections[point_]:= (* [point, tolerance] *)
 		Block[{nhess, directions},
 			
+			rec["Hessian",
 			nhess = NHessian[func, point, Scale -> step/10];
+			];
 			
 			(* This should actually be checked in the "QValidDirection" method, but *)
 			(* then the hessian would have to be recalculated.. so for performance reasons ... *)
@@ -206,8 +208,9 @@ Begin["`Private`"];
 			];
 			
 			(* directions from Hessian *)
+			rec["Eigenvalues",
 			directions = Eigensystem[nhess, -opts[Dimension]][[2]];
-			
+			];
 			
 			(* double them (forward, backward) *)
 			directions = Riffle[directions, -directions];
@@ -231,8 +234,10 @@ Begin["`Private`"];
 				manpoints = Flatten[Reap[
 				For[i=1, i<=Length[npoints], i++,
 					
+					rec["FindMinimum",
 					Quiet[s = FindMinimum[f2 @@ p, Thread[{p,npoints[[i]]}]]];
 					(* , MaxIterations->5 *)
+					];
 					
 					(* processed = ReplacePart[processed, i -> ((p /. s[[2]]) - point)]; *)
 					Sow[(p /. s[[2]])];
@@ -331,7 +336,9 @@ Begin["`Private`"];
 		Block[{grad},
 			
 			(* test *)
+			rec["Gradient",
 			grad = NGradient[func, point];
+			];
 			
 			If[Norm[grad] > maxGradientTracker, maxGradientTracker = Norm[grad]];
 			
@@ -356,8 +363,10 @@ Begin["`Private`"];
 	QEnergyTooHigh[point_]:=
 		Block[{val},
 			
+			rec["FuncEval",
 			val = Abs[func[point]];
-		
+			];
+			
 			(* test *)
 			If[val > maxFuncValTracker, maxFuncValTracker = val];
 		
@@ -384,8 +393,10 @@ Begin["`Private`"];
 	QNearPoints[point_]:= (* [point] *)
 		Block[{near},
 
+			rec["NNS",
 			near = Nearest[pointlist,point][[1]];
-
+			];
+			
 			If[Norm[point-near] < step*0.3,
 				Return[True];
 			,
