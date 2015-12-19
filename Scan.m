@@ -262,33 +262,33 @@ Begin["`Private`"];
 	QValidPoint[ppoint_,npoint_]:= (* [pastpoint, newpoint] *)
 		Block[{},
 
-				If[Not[QBack[ppoint, npoint]],
-					If[Not[QEnergyTooHigh[npoint]],
-						If[Not[QGradientTooHigh[npoint]],
-							If[Not[QNearPoints[npoint]],
-								Return[True];
-							,
-								log[logger,
-									"point rejected (nearpoints) -" <>
-									TextString[npoint] <> "-" <> TextString[ppoint]];
-							];
+			If[Not[QBack[ppoint, npoint]],
+				If[Not[QEnergyTooHigh[npoint]],
+					If[Not[QGradientTooHigh[npoint]],
+						If[Not[QNearPoints[npoint]],
+							Return[True];
 						,
 							log[logger,
-								"point rejected (gradienttoohigh) -" <>
+								"point rejected (nearpoints) -" <>
 								TextString[npoint] <> "-" <> TextString[ppoint]];
-							rejectedCounterGrad += 1;
 						];
 					,
 						log[logger,
-							"point rejected (valuetoohigh) -" <>
-							TextString[func[npoint]] <> "-" <> TextString[npoint] <> "-" <> TextString[ppoint]];
-						rejectedCounterVal += 1;
+							"point rejected (gradienttoohigh) -" <>
+							TextString[npoint] <> "-" <> TextString[ppoint]];
+						rejectedCounterGrad += 1;
 					];
 				,
 					log[logger,
-						"point rejected (back) -" <>
-						TextString[npoint] <> "-" <> TextString[ppoint]];
+						"point rejected (valuetoohigh) -" <>
+						TextString[func[npoint]] <> "-" <> TextString[npoint] <> "-" <> TextString[ppoint]];
+					rejectedCounterVal += 1;
 				];
+			,
+				log[logger,
+					"point rejected (back) -" <>
+					TextString[npoint] <> "-" <> TextString[ppoint]];
+			];
 
 			(*otherwise*)
 			Return[False];
