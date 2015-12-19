@@ -392,6 +392,15 @@ Begin["`Private`"];
 		
 	opts[symbol_] := OptionValue[start, startOptions, symbol];
 	
+	SetAttributes[rec, HoldRest];
+	rec[id_, expr_] := Block[{ret},
+		If[opts[Profiling],
+			ret = AddRecord[id, expr];
+		,
+			ret = expr;
+		];
+	];
+
 	generateStatus[] :=
 		Block[{status},
 			status = {
