@@ -25,6 +25,8 @@
 
 BeginPackage["BProbe`Scan`"];
 
+	Get["BProbe`Profiler`"]
+
 	(* we don't need to expose this, since the user doesn't see it anyhow *)
 	init::usage="init";
 	start::usage="start";
@@ -97,6 +99,7 @@ Begin["`Private`"];
 			]; 
 		
 			(* init stuff *)
+			ResetProfile[];
 			pointlist = {};
 			AppendTo[pointlist, startPoint];
 			boundary = new[Queue];
@@ -130,7 +133,6 @@ Begin["`Private`"];
 			];
 
 			logger = new[Logger, OptionValue[LogFile]];
-			If[OptionValue[Profiling],Get["BProbe`Profiler`"]];
 
 			cpoint = Last[pointlist];
 			ppoint = Last[pointlist];
@@ -166,6 +168,9 @@ Begin["`Private`"];
 			
 			(* print it out again, so it doesnt just vanish *)
 			Print[generateStatus[]];
+			
+			(* print profiling chart if enabled *)
+			If[OptionValue[Profiling], Print[ShowProfileChart[]]];
 		];
 
 
@@ -190,7 +195,6 @@ Begin["`Private`"];
 		Block[{nhess, directions},
 			
 			nhess = NHessian[func, point, Scale -> step/10];
-			
 			
 			(* This should actually be checked in the "QValidDirection" method, but *)
 			(* then the hessian would have to be recalculated.. so for performance reasons ... *)
@@ -399,6 +403,8 @@ Begin["`Private`"];
 		,
 			ret = expr;
 		];
+		
+		Return[ret];
 	];
 
 	generateStatus[] :=
