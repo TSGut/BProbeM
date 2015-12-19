@@ -1,9 +1,10 @@
 (* ::Package:: *)
  
-BeginPackage["Profiler`"];
+BeginPackage["BProbe`Profiler`"];
 
 	AddRecord::usage="";
-	ShowChart::usage="";
+	ShowProfileChart::usage="";
+	ResetProfile::usage="";
 	
 
 Begin["`Private`"];
@@ -26,7 +27,7 @@ Begin["`Private`"];
 	
 	];
 	
-	ShowChart[] := Block[{bc},
+	ShowProfileChart[] := Block[{bc},
 		bc = BarChart[
 			(Tooltip[
 				GetTotalTime[#],
@@ -52,6 +53,10 @@ Begin["`Private`"];
 	GetStandardDeviation[id_] := StandardDeviation[profiles[id]];
 	GetNumberOfCalls[id_] := Length[profiles[id]];
 	GetTotalTime[id_] := Total[profiles[id]];
+	
+	ResetProfile[] := Block[{},
+		profiles = <||>;
+	];
 
 End[];
 EndPackage[];
