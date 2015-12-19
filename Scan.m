@@ -114,7 +114,7 @@ Begin["`Private`"];
 	getlist[] := Return[pointlist];
 
 
-	Options[start] = {Dimension -> branedim, MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxDisplacementEnergy->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, UpdateInterval->0.1, LogFile->""}
+	Options[start] = {Dimension -> branedim, MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxDisplacementEnergy->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, UpdateInterval->0.1, LogFile->"", Profiling->False}
 	start[ssize_, opts:OptionsPattern[]] := (* [step size] *)
 		Block[{ppoint, cpoint, npoints, minpos, m, i},
 
@@ -130,7 +130,7 @@ Begin["`Private`"];
 			];
 
 			logger = new[Logger, OptionValue[LogFile]];
-
+			If[OptionValue[Profiling],Get["BProbe`Profiler`"]];
 
 			cpoint = Last[pointlist];
 			ppoint = Last[pointlist];
