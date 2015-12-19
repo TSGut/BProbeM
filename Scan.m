@@ -187,7 +187,7 @@ Begin["`Private`"];
 (* PRIVATE METHODS (informal) *)
 
 	determineDirections[point_]:= (* [point, tolerance] *)
-		Block[{nhess, directions, processed},
+		Block[{nhess, directions},
 			
 			nhess = NHessian[func, point, Scale -> step/10];
 			
@@ -206,14 +206,9 @@ Begin["`Private`"];
 			
 			
 			(* double them (forward, backward) *)
-			processed = {};
-			For[i=1, i<=Length[directions], i++,
-				AppendTo[processed, directions[[i]]];
-				AppendTo[processed, -directions[[i]]];
-			];
+			directions = Riffle[directions, -directions];
 			
-			
-			Return[processed];
+			Return[directions];
 		];
 
 
