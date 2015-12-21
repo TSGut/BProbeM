@@ -233,7 +233,6 @@ Begin["`Private`"];
 					(Quiet[s = FindMinimum[f2 @@ p, Thread[{p,npoints[[i]]}]]])  ~rec~ "FindMinimum";
 					(* , MaxIterations->5 *)
 					
-					(* processed = ReplacePart[processed, i -> ((p /. s[[2]]) - point)]; *)
 					Sow[(p /. s[[2]])];
 				]
 				][[2]],1];
