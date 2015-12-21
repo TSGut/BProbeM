@@ -360,14 +360,10 @@ Begin["`Private`"];
 	QNearPoints[point_]:= (* [point] *)
 		Block[{near},
 
-			near = Nearest[pointlist,point][[1]]	~rec~"NNS" ;
+			near = Nearest[pointlist,point,{1,step*0.3}]	~rec~"NNS" ;
 			
-			If[Norm[point-near] < step*0.3,
-				Return[True];
-			,
-				Return[False];
-			];
-
+			Return[Length[near] != 0];
+			
 		];
 		
 	opts[symbol_] := OptionValue[start, startOptions, symbol];
