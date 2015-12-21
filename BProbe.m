@@ -179,7 +179,7 @@ Begin["`Private`"];
 		
 		testcount = 0;
 		allsucceeded=True;
-		testdir = FileNameJoin[{ThisDirectory[], "Tests"}];
+		testdir = FileNameJoin[{thisDirectory[], "Tests"}];
 		filenames = FileNames["*Tests.m", {testdir}];
 		
 		
@@ -232,7 +232,7 @@ Begin["`Private`"];
 	
 	(* Mathematica seems to have the weirdest directory-handling I've ever seen, *)
 	(* so I need this ugly workaround *)
-	ThisDirectory[] = DirectoryName[$InputFileName];
+	thisDirectory[] = DirectoryName[$InputFileName];
 
 	
 	
