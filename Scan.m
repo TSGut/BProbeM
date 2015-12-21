@@ -75,8 +75,6 @@ Begin["`Private`"];
 			
 			reset[opts];
 			
-			inited=True; (* say: okay, we did a initialization *)
-			
 			
 			(* print info *)
 			info = {
@@ -122,16 +120,7 @@ Begin["`Private`"];
 		Block[{ppoint, cpoint, npoints, minpos, m, i},
 
 			step = ssize;
-			
 			startOptions = opts;
-			
-			
-			(* init call is necessary! *)
-			If[inited==False,
-				Message["First call Walk`init with appropriate parameters ... "];
-				Abort[];
-			];
-
 			logger = new[Logger, OptionValue[LogFile]];
 
 			cpoint = Last[pointlist];

@@ -113,8 +113,11 @@ Begin["`Private`"];
 
 		
 		info = BProbe`Scan`init[func, expf, DeleteCases[p,0], FilterRules[{opts}, Options[BProbe`Scan`init]]];
+		
+		inited=True; (* say: okay, we did a initialization *)
+		
+		
 		PrependTo[info,{"Energy Probe", Style[OptionValue[Probe],Bold]}];
-
 		Print[Panel[TextGrid[
 			info,
 			Dividers -> Center,
@@ -129,7 +132,7 @@ Begin["`Private`"];
 		
 		BProbe`Scan`reset[opts];
 		
-	];
+	] /; inited;
 
 	Options[ProbeScan] = Options[BProbe`Scan`start];
 	ProbeScan[stepsize_?NumericQ /; stepsize > 0, opts:OptionsPattern[]] := Block[{},
@@ -147,21 +150,21 @@ Begin["`Private`"];
 
 		(* print it out again, so it doesnt just vanish when finished *)
 		Print[generateStatus[]];
-	];
+	] /; inited;
 	
 	ProbeGetPointList[] := Block[{},
 		Return[BProbe`Scan`getlist[]];
-	];
+	] /; inited;
 	
 	ProbeGetMinEigenvalue[p_?(VectorQ[#,NumericQ]&)] := Block[{},
 		Return[Abs[Eigenvalues[cm @@ N[p], -1][[1]]]];
-	];
+	] /; inited;
 	
 	ProbeGetEigenvalues[p_?(VectorQ[#,NumericQ]&)] := Block[{},
 		Return[Eigenvalues[cm @@ N[p]]];
-	];
+	] /; inited;
 	
-	ProbeGetState[p_?(VectorQ[#,NumericQ]&)] := Block[{},
+	ProbeGetState[p_?(VectorQ[#,NumericQ]&) /; inited] := Block[{},
 		Return[Eigensystem[cm @@ N[p],-1][[2,1]]];
 	];
 	
