@@ -255,8 +255,8 @@ Begin["`Private`"];
 	
 		status = {
 			{ "Number of Total Points Gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },
-			{ "Number Of Points in Queue To Process" , BProbe`Scan`Private`size[BProbe`Scan`Private`boundary] },
-			{ "Maxixmal Occured Eigenvalue-Ratio" , BProbe`Scan`Private`maxEVRatioTracker },
+			{ "Number of Points in Queue To Process" , BProbe`Scan`Private`size[BProbe`Scan`Private`boundary] },
+			{ "Maximal Occured Eigenvalue-Ratio" , BProbe`Scan`Private`maxEVRatioTracker },
 			{ "Maximal Occured Displacement Energy" , BProbe`Scan`Private`maxFuncValTracker }
 		};
 		
