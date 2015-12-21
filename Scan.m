@@ -139,7 +139,6 @@ Begin["`Private`"];
 
 
 			(* CORE *)
-			Monitor[
 			While[boundary.size[] != 0,
 				{ppoint, cpoint} = boundary.pop[];
 				
@@ -159,15 +158,8 @@ Begin["`Private`"];
 				
 			];
 			
-			,	
-				(* status message *)
-				Refresh[ generateStatus[], TrackedSymbols->{}, FilterRules[Options[start], Options[Refresh]]]
-			];
-			
 			close[logger];
 			
-			(* print it out again, so it doesnt just vanish *)
-			Print[generateStatus[]];
 			
 			(* print profiling chart if enabled *)
 			If[OptionValue[Profiling], Print[ShowProfileChart[]]];
@@ -404,37 +396,6 @@ Begin["`Private`"];
 		
 		Return[ret];
 	];
-
-	generateStatus[] :=
-		Block[{status},
-			status = {
-				{ "Total points gathered" , Length[pointlist] },
-				{ "Points in queue" , size[boundary] },
-				{ "Max occured EV-Ratio" , maxEVRatioTracker },
-				{ "Max occured displacement energy" , maxFuncValTracker },
-				{ "Max occured gradient" , maxGradientTracker }
-			};
-			
-			If[opts[MaxEVRatio] < \[Infinity],
-				AppendTo[status, { "Rejected pts (EVRatio)" , rejectedCounterRat }];
-			];
-			
-			If[opts[MaxDisplacementEnergy] < \[Infinity],
-				AppendTo[status, { "Rejected pts (FuncValue)" , rejectedCounterVal }];
-			];
-			
-			If[opts[MaxGradient] < \[Infinity],
-				AppendTo[status, { "Rejected pts (Gradient)" , rejectedCounterGrad }];
-			];
-			
-			Panel[TextGrid[
-				status,
-				Dividers -> Center,
-				Alignment -> {{Left,Center}},
-				Spacings -> {3,2},
-				ItemSize -> {{Automatic, Fit}}
-			], "Status Information", ImageSize->Full]
-		];
 
 
 

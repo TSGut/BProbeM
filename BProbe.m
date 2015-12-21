@@ -136,10 +136,17 @@ Begin["`Private`"];
 		
 		PrintTemporary["Scanning surface ... ",ProgressIndicator[Appearance -> "Necklace"]];
 		
-		BProbe`Scan`start[stepsize,
-			FilterRules[{opts}, Options[BProbe`Scan`start]]
+		Monitor[
+			BProbe`Scan`start[stepsize,
+				FilterRules[{opts}, Options[BProbe`Scan`start]]
+			];
+		,
+			(* status message *)
+			Refresh[ generateStatus[], TrackedSymbols->{}, FilterRules[Options[start], Options[Refresh]]]
 		];
 
+		(* print it out again, so it doesnt just vanish when finished *)
+		Print[generateStatus[]];
 	];
 	
 	ProbeGetPointList[] := Block[{},
@@ -234,7 +241,36 @@ Begin["`Private`"];
 	(* so I need this ugly workaround *)
 	thisDirectory[] = DirectoryName[$InputFileName];
 
-	
+	(* status message: accesses private variables of `Scan` *)
+	generateStatus[] := Block[{status},
+		status = {
+			{ "Total points gathered" , Length[BProbe`Scan`Private`pointlist] },
+			{ "Points in queue" , BProbe`Scan`Private`size[BProbe`Scan`Private`boundary] },
+			{ "Max occured EV-Ratio" , BProbe`Scan`Private`maxEVRatioTracker },
+			{ "Max occured displacement energy" , BProbe`Scan`Private`maxFuncValTracker },
+			{ "Max occured gradient" , BProbe`Scan`Private`maxGradientTracker }
+		};
+		
+		If[opts[MaxEVRatio] < \[Infinity],
+			AppendTo[status, { "Rejected pts (EVRatio)" , BProbe`Scan`Private`rejectedCounterRat }];
+		];
+		
+		If[opts[MaxDisplacementEnergy] < \[Infinity],
+			AppendTo[status, { "Rejected pts (FuncValue)" , BProbe`Scan`Private`rejectedCounterVal }];
+		];
+		
+		If[opts[MaxGradient] < \[Infinity],
+			AppendTo[status, { "Rejected pts (Gradient)" , BProbe`Scan`Private`rejectedCounterGrad }];
+		];
+		
+		Panel[TextGrid[
+			status,
+			Dividers -> Center,
+			Alignment -> {{Left,Center}},
+			Spacings -> {3,2},
+			ItemSize -> {{Automatic, Fit}}
+		], "Status Information", ImageSize->Full]
+	];
 	
 	
 
