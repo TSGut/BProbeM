@@ -254,10 +254,10 @@ Begin["`Private`"];
 		opts[symbol_] := OptionValue[ProbeScan, options, symbol];
 	
 		status = {
-			{ "Total points gathered" , Length[BProbe`Scan`Private`pointlist] },
-			{ "Points in queue" , BProbe`Scan`Private`size[BProbe`Scan`Private`boundary] },
-			{ "Max occured EV-Ratio" , BProbe`Scan`Private`maxEVRatioTracker },
-			{ "Max occured displacement energy" , BProbe`Scan`Private`maxFuncValTracker }
+			{ "Number of Total Points Gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },
+			{ "Number Of Points in Queue To Process" , BProbe`Scan`Private`size[BProbe`Scan`Private`boundary] },
+			{ "Maxixmal Occured Eigenvalue-Ratio" , BProbe`Scan`Private`maxEVRatioTracker },
+			{ "Maximal Occured Displacement Energy" , BProbe`Scan`Private`maxFuncValTracker }
 		};
 		
 		If[opts[GradientTracker] || (opts[MaxGradient] < \[Infinity]),
@@ -279,7 +279,7 @@ Begin["`Private`"];
 		Panel[TextGrid[
 			status,
 			Dividers -> Center,
-			Alignment -> {{Left,Center}},
+			Alignment -> {{Right,Center},Table[Top,Length[status]]},
 			Spacings -> {3,2},
 			ItemSize -> {{Automatic, Fit}}
 		], "Status Information", ImageSize->Full]
