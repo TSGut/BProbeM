@@ -230,7 +230,7 @@ Begin["`Private`"];
 			(* if not deactivated *)
 			(* replace points by their corresponding expectation values *)
 			If[opts[ReplacePoints],
-				manpoints = expvfunc[#]& /@ npoints;
+				(manpoints = expvfunc[#]& /@ npoints)	~rec~"ReplacePoints";
 			];
 			
 			
