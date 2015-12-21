@@ -42,6 +42,10 @@ VerificationTest[ ProbeScan[0.8, UpdateInterval->0.5]
 	, Null
 	, TestID -> "ProbeScan-UpdateInterval"
 ];
+VerificationTest[ ProbeScan[0.8, GradientTracker->True]
+	, Null
+	, TestID -> "ProbeScan-GradienTracker"
+];
 
 (* test fuzzy sphere *)
 ProbeInit[PauliMatrix[{1,2,3}],StartingPoint->{1,0,0}];
