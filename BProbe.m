@@ -101,12 +101,12 @@ Begin["`Private`"];
 		
 		(* compile the operator for (a lot) better performance *)
 		expr = Simplify[ComplexExpand[m], Element[p, Reals]];
-		cm = Compile @@ {DeleteCases[p,0], expr};
+		cm = Compile @@ {DeleteCases[p,0], expr, RuntimeOptions->"Speed", CompilationTarget->"C"};
 		func[y_] := Abs[Eigenvalues[cm @@ N[y], -1][[1]]];	(* define the function to be quasi-minimized *)
 		
 		(* compile expectation value of state *)
 		PrintTemporary["* Compiling expectation-value function ..."];
-		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], eexpr};
+		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], eexpr, RuntimeOptions->"Speed", CompilationTarget->"C"};
 		expf[y_] := Block[{state},
 			state = Eigenvectors[cm @@ N[y], -1][[1]];
 			Return[Re[cexp @@ state]]; (* they should be real (always ?! todo) *)
