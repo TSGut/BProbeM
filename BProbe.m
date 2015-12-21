@@ -146,11 +146,11 @@ Begin["`Private`"];
 			];
 		,
 			(* status message *)
-			Refresh[ generateStatus[], TrackedSymbols->{}, FilterRules[Options[start], Options[Refresh]]]
+			Refresh[ generateStatus[opts], TrackedSymbols->{}, FilterRules[Options[start], Options[Refresh]]]
 		];
 
 		(* print it out again, so it doesnt just vanish when finished *)
-		Print[generateStatus[]];
+		Print[generateStatus[opts]];
 		
 		(* print profiling chart if enabled *)
 		If[OptionValue[Profiling], Print[BProbe`Profiler`ShowProfileChart[]]];
@@ -250,7 +250,9 @@ Begin["`Private`"];
 	thisDirectory[] = DirectoryName[$InputFileName];
 
 	(* status message: accesses private variables of `Scan` *)
-	generateStatus[] := Block[{status},
+	generateStatus[options_] := Block[{status},
+		opts[symbol_] := OptionValue[ProbeScan, options, symbol];
+	
 		status = {
 			{ "Total points gathered" , Length[BProbe`Scan`Private`pointlist] },
 			{ "Points in queue" , BProbe`Scan`Private`size[BProbe`Scan`Private`boundary] },
