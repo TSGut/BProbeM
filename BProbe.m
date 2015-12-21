@@ -255,9 +255,12 @@ Begin["`Private`"];
 			{ "Total points gathered" , Length[BProbe`Scan`Private`pointlist] },
 			{ "Points in queue" , BProbe`Scan`Private`size[BProbe`Scan`Private`boundary] },
 			{ "Max occured EV-Ratio" , BProbe`Scan`Private`maxEVRatioTracker },
-			{ "Max occured displacement energy" , BProbe`Scan`Private`maxFuncValTracker },
-			{ "Max occured gradient" , BProbe`Scan`Private`maxGradientTracker }
+			{ "Max occured displacement energy" , BProbe`Scan`Private`maxFuncValTracker }
 		};
+		
+		If[opts[GradientTracker] || (opts[MaxGradient] < \[Infinity]),
+			AppendTo[status, { "Maximal Occured Norm of Gradient" , BProbe`Scan`Private`maxGradientTracker }];
+		];
 		
 		If[opts[MaxEVRatio] < \[Infinity],
 			AppendTo[status, { "Rejected pts (EVRatio)" , BProbe`Scan`Private`rejectedCounterRat }];

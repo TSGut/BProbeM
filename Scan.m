@@ -115,7 +115,18 @@ Begin["`Private`"];
 	getlist[] := Return[pointlist];
 
 
-	Options[start] = {Dimension -> branedim, MinimalSurface -> False, MaxEVRatio->\[Infinity], MaxDisplacementEnergy->\[Infinity], MaxGradient->\[Infinity], ReplacePoints->True, UpdateInterval->0.1, LogFile->"", Profiling->False}
+	Options[start] = {
+		Dimension -> branedim,
+		MinimalSurface -> False,
+		GradientTracker -> False,
+		MaxEVRatio->\[Infinity],
+		MaxDisplacementEnergy->\[Infinity],
+		MaxGradient->\[Infinity],
+		ReplacePoints->True,
+		UpdateInterval->0.1,
+		LogFile->"",
+		Profiling->False
+	}
 	start[ssize_, opts:OptionsPattern[]] := (* [step size] *)
 		Block[{ppoint, cpoint, npoints, minpos, m, i},
 
@@ -306,22 +317,15 @@ Begin["`Private`"];
 	QGradientTooHigh[point_]:= (* [point] *)
 		Block[{grad},
 			
-			(* test *)
-			grad = NGradient[func, point]	~rec~"Gradient";
-			
-			If[Norm[grad] > maxGradientTracker, maxGradientTracker = Norm[grad]];
-			
-		
 			(* perform check only if opts[MaxGradient] is finite *)
-			If[opts[MaxGradient] < \[Infinity],
+			(* or opts[GradientTracker] is set *)
+			If[opts[MaxGradient] < \[Infinity] || opts[GradientTracker],
 				
+				grad = NGradient[func, point]	~rec~"Gradient";
 				
-				If[Norm[grad] < opts[MaxGradient],
-					Return[False];
-				,
-					Return[True];
-				];
-				
+				If[Norm[grad] > maxGradientTracker, maxGradientTracker=Norm[grad]];
+
+				Return[Norm[grad] > opts[MaxGradient]];
 			,
 				Return[False];
 			];
