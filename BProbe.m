@@ -49,6 +49,7 @@ Begin["`Private`"];
 	
 
 	Options[ProbeInit] = Options[BProbe`Scan`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
+	ProbeInit[] := Block[{}, inited=False; ];
 	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,x,dim,n,gn,m,expr,eexpr,i,gamma,subspace,info},
 		
 		dim = Length[t];				(* dimension of target space *)
