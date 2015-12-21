@@ -1,6 +1,12 @@
-(* ::Package:: *)
+ProbeInit[];
 
-(* set up *)
+VerificationTest[ProbeReset[]
+	, ProbeReset[]
+	, TestID -> "ProbeReset-inited"
+];
+
+
+
 ProbeInit[PauliMatrix[{1,2,3}], StartingPoint->{1,0,0}];
 
 (* a naive tests *)

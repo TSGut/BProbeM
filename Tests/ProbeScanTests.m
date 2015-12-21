@@ -1,6 +1,12 @@
-(* ::Package:: *)
+ProbeInit[];
 
-(* set up *)
+VerificationTest[ProbeScan[0.8]
+	, ProbeScan[0.8]
+	, TestID -> "ProbeScan-inited"
+];
+
+
+
 ProbeInit[PauliMatrix[{1,2,3}]];
 
 (* just test options *)

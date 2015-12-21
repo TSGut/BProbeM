@@ -1,6 +1,11 @@
-(* ::Package:: *)
+ProbeInit[];
 
-(* set up *)
+VerificationTest[ProbeGetMinEigenvalue[{1, 0, 0}]
+	, ProbeGetMinEigenvalue[{1, 0, 0}]
+	, TestID -> "ProbeGetMinEigenvalue-inited"
+];
+
+
 ProbeInit[PauliMatrix[{1,2,3}], Probe->"Laplace"];
 
 (* some naive tests *)

@@ -1,4 +1,11 @@
-(* set up *)
+ProbeInit[];
+
+VerificationTest[ProbeGetEigenvalues[{1, 0, 0}]
+	, ProbeGetEigenvalues[{1, 0, 0}]
+	, TestID -> "ProbeGetEigenvalues-inited"
+];
+
+
 ProbeInit[PauliMatrix[{1,2,3}], Probe->"Laplace"];
 
 VerificationTest[ProbeGetEigenvalues[{1, 0, 0}]

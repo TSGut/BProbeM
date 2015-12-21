@@ -1,6 +1,12 @@
-(* TODO *)
+ProbeInit[];
 
-(* set up *)
+VerificationTest[ProbeGetState[{1, 0, 0}]
+	, ProbeGetState[{1, 0, 0}]
+	, TestID -> "ProbeGetState-inited"
+];
+
+
+
 ProbeInit[PauliMatrix[{1,2,3}], Probe->"Laplace"];
 
 (* some naive tests *)
