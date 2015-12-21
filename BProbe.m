@@ -151,6 +151,10 @@ Begin["`Private`"];
 
 		(* print it out again, so it doesnt just vanish when finished *)
 		Print[generateStatus[]];
+		
+		(* print profiling chart if enabled *)
+		If[OptionValue[Profiling], Print[BProbe`Profiler`ShowProfileChart[]]];
+		
 	] /; inited;
 	
 	ProbeGetPointList[] := Block[{},

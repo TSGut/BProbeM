@@ -149,9 +149,6 @@ Begin["`Private`"];
 			
 			close[logger];
 			
-			
-			(* print profiling chart if enabled *)
-			If[OptionValue[Profiling], Print[ShowProfileChart[]]];
 		];
 
 
