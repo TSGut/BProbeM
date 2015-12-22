@@ -26,12 +26,16 @@
 BeginPackage["BProbe`Scan`"];
 
 	Get["BProbe`Profiler`"]
+	Get["BProbe`Gamma`"];
 
 	(* we don't need to expose this, since the user doesn't see it anyhow *)
 	init::usage="init";
 	start::usage="start";
 	reset::usage="reset";
-	getlist::usage="getlist";
+	getList::usage="getlist";
+	getMinEigenvalue::usage="";
+	getEigenvalues::usage="";
+	getState::usage="";
 
 
 Begin["`Private`"];
@@ -40,27 +44,53 @@ Begin["`Private`"];
 	Get["BProbe`Queue`"];
 
 
-	Options[init] = {StartingPoint -> "min"}
-	init[f_, exp_, x_, opts:OptionsPattern[]] :=
-		Block[{s, f2, info, evlist, i},
+	Options[init] = {
+		StartingPoint -> "min",
+		Probe -> "Laplace",
+		Subspace -> Full
+	};
+	init[t_, opts:OptionsPattern[]] :=
+		Block[{info, evlist, i, subspace, obs, gdim},
 
-			func = f;
-			expvfunc = exp;
+			If[Not[ListQ[OptionValue[Subspace]]],
+				(* in this case, take the full space *)
+				subspace = Range[1, Length[t]];
+			,
+				subspace = OptionValue[Subspace];
+			];
+		
+			PrintTemporary["* Compiling Operator ..."];
+			cop = buildOperator[t, subspace, OptionValue["Probe"]];
+			
+			PrintTemporary["* Compiling expectation-value function ..."];
+			If[OptionValue["Probe"] == "Laplace",
+				obs = t;
+			, If[OptionValue["Probe"] == "Dirac" || OptionValue["Probe"] == "DiracSq",
+				gdim = Length[MatrixRepGamma[Length[t]][[1]]];
+				obs = KroneckerProduct[IdentityMatrix[gdim],#]& /@ t;
+			]];
+			cexp = buildExpectationValue[obs[[subspace]]];
 
+			func[y_] := Abs[Eigenvalues[cop @@ N[y], -1][[1]]];
+			expvfunc[y_] := Re[cexp @@ getState[N[y]]];
+			
 			(* automatically determine starting point, if not given *)
 			If[!ListQ[OptionValue[StartingPoint]],
-				
-				PrintTemporary["* Look for global minimum of energy displacement ..."];
-				f2[p__?NumericQ] := Abs[func[{p}]];
-				s = NMinimize[f2 @@ x,x];
-				startPoint = x /. s[[2]];
-				
+				Block[{f2,p,s},
+					PrintTemporary["* Look for global minimum of energy displacement ..."];
+					p = Table[Unique["p"], {Length[t]}];
+					p[[Complement[Range[Length[t]],subspace]]] = 0;
+					p = DeleteCases[p,0];
+					f2[p__?NumericQ] := func[{p}];
+					s = NMinimize[f2 @@ p,p];
+					startPoint = p /. s[[2]];
+				];
 			,
 				startPoint = OptionValue[StartingPoint];
 			];
 			
 			(* automatically determine local dimension of brane *)
-			(* i.e. just jack for eigenvalues < some small value *)
+			(* i.e. just check for eigenvalues < some small value *)
 			branedim = 0;
 			evlist = Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]];
 			For[i=1,i<=Length[evlist],i++,
@@ -72,12 +102,11 @@ Begin["`Private`"];
 				];
 			];
 			
-			
 			reset[opts];
-			
 			
 			(* print info *)
 			info = {
+				{ "Energy Probe", Style[OptionValue[Probe], Bold] },
 				{ "Starting Point (SP)", MatrixForm[startPoint] },
 				{ "Energy at SP" , TextString[func[startPoint]] },
 				{ "Norm of Gradient at SP" , Norm[NGradient[func,startPoint]] },
@@ -88,6 +117,43 @@ Begin["`Private`"];
 			Return[info];
 		];
 
+
+	buildOperator[t_, subspace_, probe_] := Block[{n,dim,p,m,expr,cm,gamma},
+		dim = Length[t];
+		n = Length[t[[1]]];
+	
+		p = Table[Unique["p"], {dim}];
+		p[[Complement[Range[dim],subspace]]] = 0;
+		
+		Switch[probe,
+		"Laplace",
+			m = Sum[(IdentityMatrix[n] p[[i]] - t[[i]]).(IdentityMatrix[n] p[[i]] - t[[i]]), {i, 1, dim}];
+	
+		,"Dirac",
+			gamma = BProbe`Gamma`MatrixRepGamma[dim];
+			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
+			
+		,"DiracSq",
+			gamma = BProbe`Gamma`MatrixRepGamma[dim];
+			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
+			m = m.m;
+		];
+		
+		expr = Simplify[ComplexExpand[m], Element[p, Reals]];
+		cm = Compile @@ {DeleteCases[p,0], expr, RuntimeOptions->"Speed", CompilationTarget->"C"};
+		
+		Return[cm];
+	];
+
+	buildExpectationValue[obs_] := Block[{n,expr,x,cexp},
+		n = Length[obs[[1]]];
+		
+		x = Table[Unique["x"], n];
+		expr = (Conjugate[x].#.x)& /@ obs;
+		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr, RuntimeOptions->"Speed", CompilationTarget->"C"};
+		
+		Return[cexp];
+	];
 
 	Options[reset] = Options[init];
 	reset[OptionsPattern[]] := Block[{},
@@ -112,9 +178,12 @@ Begin["`Private`"];
 	];
 	
 	
-	getlist[] := Return[pointlist];
+	getList[] := Return[pointlist];
+	getMinEigenvalue[p_] := Abs[Eigenvalues[cop @@ N[p], -1][[1]]];
+	getEigenvalues[p_] := Eigenvalues[cop @@ N[p]];
+	getState[p_] := Eigenvectors[cop @@ N[p],-1][[1]];
 
-
+	
 	Options[start] = {
 		Dimension -> branedim,
 		MinimalSurface -> False,

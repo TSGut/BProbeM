@@ -43,82 +43,18 @@ BeginPackage["BProbe`"];
 
 Begin["`Private`"];
 	Get[ "BProbe`Scan`" ];
-	Get[ "BProbe`Gamma`" ];
 	Get[ "BProbe`SU2Gen`" ];
 	Get[ "BProbe`SU3Gen`" ];
 	
 
-	Options[ProbeInit] = Options[BProbe`Scan`init] ~Join~ {Probe -> "Laplace", Subspace -> Full};
+	Options[ProbeInit] = Options[BProbe`Scan`init];
 	ProbeInit[] := Block[{}, inited=False; ];
-	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{p,x,dim,n,gn,m,expr,eexpr,i,gamma,subspace,info},
+	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{info},
 		
-		dim = Length[t];				(* dimension of target space *)
-		n = Length[t[[1]]];				(* n times n matrices *)
-		
-		If[Not[ListQ[OptionValue[Subspace]]],
-			subspace = Range[1, dim]; 			(* in this case, take the full space *)
-		,
-			subspace = OptionValue[Subspace];
-		];
-		
-		p = Table[Unique["p"], {dim}];
-		p[[Complement[Range[dim],subspace]]] = 0;
-		
-		
-		(* build appropriate operator/matrix *)
-		PrintTemporary["* Compiling " <> TextString[OptionValue[Probe]] <> " Operator ..."];
-		
-		Switch[OptionValue[Probe],
-		
-		"Laplace",
-			m = Sum[(IdentityMatrix[n] p[[i]] - t[[i]]).(IdentityMatrix[n] p[[i]] - t[[i]]), {i, 1, dim}];
-			
-			(* prepare for later *)
-			x = Table[Unique["x"], n];
-			eexpr = (Conjugate[x].#.x)& /@ t[[subspace]];
-		
-		,"Dirac",
-			gamma = BProbe`Gamma`MatrixRepGamma[dim];
-			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
-			
-			(* prepare for later *)
-			gn = Length[gamma[[1]]];
-			x = Table[Unique["x"], n*gn];
-			eexpr = (Conjugate[x].KroneckerProduct[IdentityMatrix[gn],#].x)& /@ t[[subspace]];
-			
-		,"DiracSq",
-			gamma = BProbe`Gamma`MatrixRepGamma[dim];
-			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
-			m = m.m;
-			
-			(* prepare for later *)
-			gn = Length[gamma[[1]]];
-			x = Table[Unique["x"], n*gn];
-			eexpr = (Conjugate[x].KroneckerProduct[IdentityMatrix[gn],#].x)& /@ t[[subspace]];
-			
-		];
-		
-		
-		(* compile the operator for (a lot) better performance *)
-		expr = Simplify[ComplexExpand[m], Element[p, Reals]];
-		cm = Compile @@ {DeleteCases[p,0], expr, RuntimeOptions->"Speed", CompilationTarget->"C"};
-		func[y_] := Abs[Eigenvalues[cm @@ N[y], -1][[1]]];	(* define the function to be quasi-minimized *)
-		
-		(* compile expectation value of state *)
-		PrintTemporary["* Compiling expectation-value function ..."];
-		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], eexpr, RuntimeOptions->"Speed", CompilationTarget->"C"};
-		expf[y_] := Block[{state},
-			state = Eigenvectors[cm @@ N[y], -1][[1]];
-			Return[Re[cexp @@ state]]; (* they should be real (always ?! todo) *)
-		];
-
-		
-		info = BProbe`Scan`init[func, expf, DeleteCases[p,0], FilterRules[{opts}, Options[BProbe`Scan`init]]];
+		info = BProbe`Scan`init[t, FilterRules[{opts}, Options[BProbe`Scan`init]]];
 		
 		inited=True; (* say: okay, we did a initialization *)
 		
-		
-		PrependTo[info,{"Energy Probe", Style[OptionValue[Probe],Bold]}];
 		Print[Panel[TextGrid[
 			info,
 			Dividers -> Center,
@@ -137,7 +73,7 @@ Begin["`Private`"];
 
 	Options[ProbeScan] = Options[BProbe`Scan`start];
 	ProbeScan[stepsize_?NumericQ /; stepsize > 0, opts:OptionsPattern[]] := Block[{},
-		
+
 		PrintTemporary["Scanning surface ... ",ProgressIndicator[Appearance -> "Necklace"]];
 		
 		Monitor[
@@ -158,20 +94,20 @@ Begin["`Private`"];
 	] /; inited;
 	
 	ProbeGetPointList[] := Block[{},
-		Return[BProbe`Scan`getlist[]];
+		Return[BProbe`Scan`getList[]];
 	] /; inited;
 	
 	ProbeGetMinEigenvalue[p_?(VectorQ[#,NumericQ]&)] := Block[{},
-		Return[Abs[Eigenvalues[cm @@ N[p], -1][[1]]]];
+		Return[BProbe`Scan`getMinEigenvalue[p]];
 	] /; inited;
 	
 	ProbeGetEigenvalues[p_?(VectorQ[#,NumericQ]&)] := Block[{},
-		Return[Eigenvalues[cm @@ N[p]]];
+		Return[BProbe`Scan`getEigenvalues[p]];
 	] /; inited;
 	
-	ProbeGetState[p_?(VectorQ[#,NumericQ]&) /; inited] := Block[{},
-		Return[Eigensystem[cm @@ N[p],-1][[2,1]]];
-	];
+	ProbeGetState[p_?(VectorQ[#,NumericQ]&)] := Block[{},
+		Return[BProbe`Scan`getState[p]];
+	] /; inited;
 	
 	MatrixRepSU2[n_?NumericQ /; n>0] := Block[{},
 		Return[BProbe`SU2Gen`Private`MatrixRepSU2[n]];
