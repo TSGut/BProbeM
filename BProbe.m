@@ -71,7 +71,7 @@ Begin["`Private`"];
 		
 	] /; inited;
 
-	Options[ProbeScan] = Options[BProbe`Scan`start];
+	Options[ProbeScan] = Options[BProbe`Scan`start] ~Join~ {UpdateInterval->0.1};
 	ProbeScan[stepsize_?NumericQ /; stepsize > 0, opts:OptionsPattern[]] := Block[{},
 
 		PrintTemporary["Scanning surface ... ",ProgressIndicator[Appearance -> "Necklace"]];
@@ -82,11 +82,11 @@ Begin["`Private`"];
 			];
 		,
 			(* status message *)
-			Refresh[ generateStatus[opts], TrackedSymbols->{}, FilterRules[Options[start], Options[Refresh]]]
+			Refresh[ generateStatus[FilterRules[{opts}, Options[BProbe`Scan`start]]], TrackedSymbols->{}, UpdateInterval -> OptionValue[UpdateInterval]]
 		];
 
 		(* print it out again, so it doesnt just vanish when finished *)
-		Print[generateStatus[opts]];
+		Print[generateStatus[FilterRules[{opts}, Options[BProbe`Scan`start]]]];
 		
 		(* print profiling chart if enabled *)
 		If[OptionValue[Profiling], Print[BProbe`Profiler`ShowProfileChart[]]];
@@ -186,8 +186,8 @@ Begin["`Private`"];
 	thisDirectory[] = DirectoryName[$InputFileName];
 
 	(* status message: accesses private variables of `Scan` *)
-	generateStatus[options_] := Block[{status},
-		opts[symbol_] := OptionValue[ProbeScan, options, symbol];
+	generateStatus[options:OptionsPattern[]] := Block[{status},
+		opts[symbol_] := OptionValue[BProbe`Scan`start, options, symbol];
 	
 		status = {
 			{ "Number of Total Points Gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },

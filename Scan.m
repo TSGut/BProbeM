@@ -192,7 +192,6 @@ Begin["`Private`"];
 		MaxDisplacementEnergy->\[Infinity],
 		MaxGradient->\[Infinity],
 		ReplacePoints->True,
-		UpdateInterval->0.1,
 		LogFile->"",
 		Profiling->False
 	}
