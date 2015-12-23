@@ -139,7 +139,7 @@ Begin["`Private`"];
 			m = m.m;
 		];
 		
-		expr = Simplify[ComplexExpand[m], Element[p, Reals]];
+		expr = ComplexExpand[m];
 		cm = Compile @@ {DeleteCases[p,0], expr, RuntimeOptions->"Speed", CompilationTarget->"C"};
 		
 		Return[cm];
@@ -149,7 +149,7 @@ Begin["`Private`"];
 		n = Length[obs[[1]]];
 		
 		x = Table[Unique["x"], n];
-		expr = (Conjugate[x].#.x)& /@ obs;
+		expr = ComplexExpand[(Conjugate[x].#.x)& /@ obs, x];
 		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr, RuntimeOptions->"Speed", CompilationTarget->"C"};
 		
 		Return[cexp];
