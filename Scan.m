@@ -71,7 +71,7 @@ Begin["`Private`"];
 			]];
 			cexp = buildExpectationValue[obs[[subspace]]];
 
-			func[y_] := Abs[Eigenvalues[cop @@ N[y], -1][[1]]];
+			energyf[y_] := Abs[Eigenvalues[cop @@ N[y], -1][[1]]];
 			expvfunc[y_] := Re[cexp @@ getState[N[y]]];
 			
 			(* automatically determine starting point, if not given *)
@@ -81,7 +81,7 @@ Begin["`Private`"];
 					p = Table[Unique["p"], {Length[t]}];
 					p[[Complement[Range[Length[t]],subspace]]] = 0;
 					p = DeleteCases[p,0];
-					f2[p__?NumericQ] := func[{p}];
+					f2[p__?NumericQ] := energyf[{p}];
 					s = NMinimize[f2 @@ p,p];
 					startPoint = p /. s[[2]];
 				];
@@ -108,7 +108,7 @@ Begin["`Private`"];
 			info = {
 				{ "Energy Probe", Style[OptionValue[Probe], Bold] },
 				{ "Starting Point (SP)", MatrixForm[startPoint] },
-				{ "Energy at SP" , TextString[func[startPoint]] },
+				{ "Energy at SP" , TextString[energyf[startPoint]] },
 				{ "Norm of Gradient at SP" , Norm[NGradient[func,startPoint]] },
 				{ "Absolute Hessian Eigenvalues at SP", MatrixForm[evlist] },
 				{ "Local brane dimension", Style[ToString[branedim],{Darker[If[branedim==0,Red,Green]],Bold}] }
@@ -282,7 +282,7 @@ Begin["`Private`"];
 			(* FindMinimum to get a better approximation *)		
 			If[opts[MinimalSurface],
 				
-				f2[p__?NumericQ] := func[{p}];
+				f2[p__?NumericQ] := energyf[{p}];
 				p = Table[Unique["p"], {Length[npoints[[1]]]}];
 				
 				manpoints = Flatten[Reap[
@@ -341,7 +341,7 @@ Begin["`Private`"];
 				,
 					log[logger,
 						"point rejected (valuetoohigh) -" <>
-						TextString[func[npoint]] <> "-" <> TextString[npoint] <> "-" <> TextString[ppoint]];
+						TextString[energyf[npoint]] <> "-" <> TextString[npoint] <> "-" <> TextString[ppoint]];
 					rejectedCounterVal += 1;
 				];
 			,
@@ -408,7 +408,7 @@ Begin["`Private`"];
 			(* perform check only if opts[MaxEnergy] is finite *)
 			If[opts[MaxEnergy] < \[Infinity] || opts[EnergyTracker],
 				
-				val = Abs[func[point]]		~rec~"FuncEval";
+				val = Abs[energyf[point]]		~rec~"FuncEval";
 				
 				If[val > maxEnergyTracker, maxEnergyTracker = val];
 				
