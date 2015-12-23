@@ -207,15 +207,15 @@ Begin["`Private`"];
 		
 		rejections = Flatten[Reap[
 			If[opts[MaxEVRatio] < \[Infinity],
-				Saw[{ "Rejected Points (EVRatio)" , BProbe`Scan`Private`rejectedCounterRat }];
+				Sow[{ "Rejected Points (EVRatio)" , BProbe`Scan`Private`rejectedCounterRat }];
 			];
 			
 			If[opts[MaxEnergy] < \[Infinity],
-				Saw[{ "Rejected Points (Energy)" , BProbe`Scan`Private`rejectedCounterVal }];
+				Sow[{ "Rejected Points (Energy)" , BProbe`Scan`Private`rejectedCounterVal }];
 			];
 			
 			If[opts[MaxGradient] < \[Infinity],
-				Saw[{ "Rejected Points (Gradient)" , BProbe`Scan`Private`rejectedCounterGrad }];
+				Sow[{ "Rejected Points (Gradient)" , BProbe`Scan`Private`rejectedCounterGrad }];
 			];
 		][[2]],1];
 
