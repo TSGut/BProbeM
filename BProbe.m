@@ -200,7 +200,7 @@ Begin["`Private`"];
 		];
 		
 		If[opts[EnergyTracker] || (opts[MaxEnergy] < \[Infinity]),
-			AppendTo[status, { "Maximal Occured Displacement Energy" , BProbe`Scan`Private`maxFuncValTracker }];
+			AppendTo[status, { "Maximal Occured Displacement Energy" , BProbe`Scan`Private`maxEnergyTracker }];
 		];
 		
 		If[opts[MaxEVRatio] < \[Infinity],

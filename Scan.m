@@ -172,7 +172,7 @@ Begin["`Private`"];
 			rejectedCounterGrad = 0;
 			rejectedCounterVal = 0;
 			rejectedCounterRat = 0;
-			maxFuncValTracker = 0;
+			maxEnergyTracker = 0;
 			maxEVRatioTracker = 0;
 			maxGradientTracker = 0;
 	];
@@ -410,7 +410,7 @@ Begin["`Private`"];
 				
 				val = Abs[func[point]]		~rec~"FuncEval";
 				
-				If[val > maxFuncValTracker, maxFuncValTracker = val];
+				If[val > maxEnergyTracker, maxEnergyTracker = val];
 				
 				Return[val > opts[MaxEnergy]];
 			,
