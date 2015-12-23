@@ -106,3 +106,39 @@ VerificationTest[ProbeGetPointList[]
 		Return[same];
 	]]
 ];
+
+ProbeInit[PauliMatrix[{1,2,3}],StartingPoint->{1,0,0}];
+ProbeScan[0.8, ReplacePoints->False, MaxEnergy->2.3];
+VerificationTest[ProbeGetPointList[]
+	,{{1,0,0},{1.,0.8,0.},{1.,-0.8,0.},{1.,0.,0.8},{1.,0.,-0.8},{1.,0.8,0.8},{1.,0.8,-0.8},{0.500105,1.42458,-4.26609*10^-12},{1.,-0.8,0.8},{1.,-0.8,-0.8},{0.500105,-1.42458,-4.26609*10^-12},{0.500105,0.,1.42458},{0.500105,0.,-1.42458}}
+	,TestID->"ProbeScan-FuzzySphere-MaxEnergy"
+	, SameTest -> Function[{list1,list2}, Block[{i, same},
+		same = True;
+		
+		For[i=1,i<=Length[list1],i++,
+			If[Norm[list1[[i]]-list2[[i]]] > 10^-4,
+			same = False;
+			];
+		];
+	
+		Return[same];
+	]]
+];
+
+ProbeInit[PauliMatrix[{1,2,3}],StartingPoint->{1,0,0}];
+ProbeScan[0.8, ReplacePoints->False, MaxGradient->1.1];
+VerificationTest[ProbeGetPointList[]
+	,{{1,0,0},{1.,0.8,0.},{1.,-0.8,0.},{1.,0.,0.8},{1.,0.,-0.8},{1.,0.8,0.8},{1.,0.8,-0.8},{0.500105,1.42458,-4.26609*10^-12},{1.,-0.8,0.8},{1.,-0.8,-0.8},{0.500105,-1.42458,-4.26609*10^-12},{0.500105,0.,1.42458},{0.500105,0.,-1.42458}}
+	,TestID->"ProbeScan-FuzzySphere-MaxGradient"
+	, SameTest -> Function[{list1,list2}, Block[{i, same},
+		same = True;
+		
+		For[i=1,i<=Length[list1],i++,
+			If[Norm[list1[[i]]-list2[[i]]] > 10^-4,
+			same = False;
+			];
+		];
+	
+		Return[same];
+	]]
+];
