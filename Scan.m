@@ -264,7 +264,7 @@ Begin["`Private`"];
 			];
 			
 			(* directions from Hessian *)
-			(directions = Eigensystem[nhess, -opts[Dimension]][[2]])	~rec~ "Eigenvalues";
+			(directions = Eigenvectors[nhess, -opts[Dimension]])	~rec~ "Eigenvectors";
 			
 			(* double them (forward, backward) *)
 			directions = Riffle[directions, -directions];
