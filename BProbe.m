@@ -186,44 +186,56 @@ Begin["`Private`"];
 	thisDirectory[] = DirectoryName[$InputFileName];
 
 	(* status message: accesses private variables of `Scan` *)
-	generateStatus[options:OptionsPattern[]] := Block[{status},
+	generateStatus[options:OptionsPattern[]] := Block[{status, points, tracker, rejections},
 		opts[symbol_] := OptionValue[BProbe`Scan`start, options, symbol];
 	
-		status = {
+		points = {
 			{ "Number of Total Points Gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },
 			{ "Number of Points in Queue To Process" , BProbe`Scan`Private`size[BProbe`Scan`Private`boundary] }
 (*			{ "Maximal Occured Eigenvalue-Ratio" , BProbe`Scan`Private`maxEVRatioTracker }*)
 		};
 		
-		If[opts[GradientTracker] || (opts[MaxGradient] < \[Infinity]),
-			AppendTo[status, { "Maximal Occured Norm of Gradient" , BProbe`Scan`Private`maxGradientTracker }];
-		];
+		tracker = Flatten[Reap[
+			If[opts[GradientTracker] || (opts[MaxGradient] < \[Infinity]),
+				Sow[{ "Maximal Occured Norm of Gradient" , BProbe`Scan`Private`maxGradientTracker }];
+			];
+			
+			If[opts[EnergyTracker] || (opts[MaxEnergy] < \[Infinity]),
+				Sow[{ "Maximal Occured Displacement Energy" , BProbe`Scan`Private`maxEnergyTracker }];
+			];
+		][[2]],1];
 		
-		If[opts[EnergyTracker] || (opts[MaxEnergy] < \[Infinity]),
-			AppendTo[status, { "Maximal Occured Displacement Energy" , BProbe`Scan`Private`maxEnergyTracker }];
-		];
+		rejections = Flatten[Reap[
+			If[opts[MaxEVRatio] < \[Infinity],
+				Saw[{ "Rejected Points (EVRatio)" , BProbe`Scan`Private`rejectedCounterRat }];
+			];
+			
+			If[opts[MaxEnergy] < \[Infinity],
+				Saw[{ "Rejected Points (Energy)" , BProbe`Scan`Private`rejectedCounterVal }];
+			];
+			
+			If[opts[MaxGradient] < \[Infinity],
+				Saw[{ "Rejected Points (Gradient)" , BProbe`Scan`Private`rejectedCounterGrad }];
+			];
+		][[2]],1];
+
+		status = Flatten[Reap[
+			Sow[{ getPanel["Status Information", points] }];
+			If[Length[tracker] > 0, Sow[{ getPanel["Tracker", tracker] }]];
+			If[Length[rejections] > 0, Sow[{ getPanel["Rejection of Points", rejections] }]];
+		][[2]],1];
 		
-		If[opts[MaxEVRatio] < \[Infinity],
-			AppendTo[status, { "Rejected pts (EVRatio)" , BProbe`Scan`Private`rejectedCounterRat }];
-		];
-		
-		If[opts[MaxEnergy] < \[Infinity],
-			AppendTo[status, { "Rejected pts (FuncValue)" , BProbe`Scan`Private`rejectedCounterVal }];
-		];
-		
-		If[opts[MaxGradient] < \[Infinity],
-			AppendTo[status, { "Rejected pts (Gradient)" , BProbe`Scan`Private`rejectedCounterGrad }];
-		];
-		
-		Panel[TextGrid[
-			status,
-			Dividers -> Center,
-			Alignment -> {{Right,Center},Table[Top,Length[status]]},
-			Spacings -> {3,2},
-			ItemSize -> {{Automatic, Fit}}
-		], "Status Information", ImageSize->Full]
+		Grid[status, Spacings -> {0,1}]
 	];
 	
+	getPanel[title_, textgrid_] :=
+		Panel[TextGrid[
+			textgrid,
+			Dividers -> Center,
+			Alignment -> {{Right,Center},Table[Top,Length[textgrid]]},
+			Spacings -> {3,2},
+			ItemSize -> {{Automatic, Fit}}
+		], title, ImageSize->Full];
 	
 
     (* formatting stuff for usage messages	*)
