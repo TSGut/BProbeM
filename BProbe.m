@@ -192,12 +192,15 @@ Begin["`Private`"];
 		status = {
 			{ "Number of Total Points Gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },
 			{ "Number of Points in Queue To Process" , BProbe`Scan`Private`size[BProbe`Scan`Private`boundary] },
-			{ "Maximal Occured Eigenvalue-Ratio" , BProbe`Scan`Private`maxEVRatioTracker },
-			{ "Maximal Occured Displacement Energy" , BProbe`Scan`Private`maxFuncValTracker }
+			{ "Maximal Occured Eigenvalue-Ratio" , BProbe`Scan`Private`maxEVRatioTracker }
 		};
 		
 		If[opts[GradientTracker] || (opts[MaxGradient] < \[Infinity]),
 			AppendTo[status, { "Maximal Occured Norm of Gradient" , BProbe`Scan`Private`maxGradientTracker }];
+		];
+		
+		If[opts[EnergyTracker] || (opts[MaxEnergy] < \[Infinity]),
+			AppendTo[status, { "Maximal Occured Displacement Energy" , BProbe`Scan`Private`maxFuncValTracker }];
 		];
 		
 		If[opts[MaxEVRatio] < \[Infinity],

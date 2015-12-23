@@ -188,6 +188,7 @@ Begin["`Private`"];
 		Dimension -> branedim,
 		MinimalSurface -> False,
 		GradientTracker -> False,
+		EnergyTracker -> False,
 		MaxEVRatio->\[Infinity],
 		MaxEnergy->\[Infinity],
 		MaxGradient->\[Infinity],
@@ -404,20 +405,14 @@ Begin["`Private`"];
 	QEnergyTooHigh[point_]:=
 		Block[{val},
 			
-			val = Abs[func[point]]		~rec~"FuncEval";
-			
-			(* test *)
-			If[val > maxFuncValTracker, maxFuncValTracker = val];
-		
 			(* perform check only if opts[MaxEnergy] is finite *)
-			If[opts[MaxEnergy] < \[Infinity],
+			If[opts[MaxEnergy] < \[Infinity] || opts[EnergyTracker],
 				
-				If[val < opts[MaxEnergy],
-					Return[False];
-				,
-					Return[True];
-				];
-			
+				val = Abs[func[point]]		~rec~"FuncEval";
+				
+				If[val > maxFuncValTracker, maxFuncValTracker = val];
+				
+				Return[val > opts[MaxEnergy]];
 			,
 				Return[False];
 			];
