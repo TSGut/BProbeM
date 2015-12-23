@@ -46,6 +46,10 @@ VerificationTest[ ProbeScan[0.8, GradientTracker->True]
 	, Null
 	, TestID -> "ProbeScan-GradienTracker"
 ];
+VerificationTest[ ProbeScan[0.8, EnergyTracker->True]
+	, Null
+	, TestID -> "ProbeScan-EnergyTracker"
+];
 
 (* test fuzzy sphere *)
 ProbeInit[PauliMatrix[{1,2,3}],StartingPoint->{1,0,0}];
