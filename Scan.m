@@ -91,7 +91,7 @@ Begin["`Private`"];
 		(* automatically determine local dimension of brane *)
 		(* i.e. just check for eigenvalues < some small value *)
 		branedim = 0;
-		evlist = Sort[Abs[#]&/@ Eigenvalues[NHessian[func,startPoint, Scale -> 0.01]]];
+		evlist = Sort[Abs[#]&/@ Eigenvalues[NHessian[energyf,startPoint, Scale -> 0.01]]];
 		For[i=1,i<=Length[evlist],i++,
 			If[evlist[[i]] < 0.3,
 				branedim += 1;
@@ -108,7 +108,7 @@ Begin["`Private`"];
 			{ "Energy Probe", Style[OptionValue[Probe], Bold] },
 			{ "Starting Point (SP)", MatrixForm[startPoint] },
 			{ "Energy at SP" , TextString[energyf[startPoint]] },
-			{ "Norm of Gradient at SP" , Norm[NGradient[func,startPoint]] },
+			{ "Norm of Gradient at SP" , Norm[NGradient[energyf,startPoint]] },
 			{ "Absolute Hessian Eigenvalues at SP", MatrixForm[evlist] },
 			{ "Local brane dimension", Style[ToString[branedim],{Darker[If[branedim==0,Red,Green]],Bold}] }
 		};
@@ -248,7 +248,7 @@ Begin["`Private`"];
 
 	determineDirections[point_] := Block[{nhess, directions},
 			
-		(nhess = NHessian[func, point, Scale -> step/10])	 ~rec~ "Hessian" ;
+		(nhess = NHessian[energyf, point, Scale -> step/10])	 ~rec~ "Hessian" ;
 		
 		(* This should actually be checked in the "QValidDirection" method, but *)
 		(* then the hessian would have to be recalculated.. so for performance reasons ... *)
@@ -381,7 +381,7 @@ Begin["`Private`"];
 		(* or opts[GradientTracker] is set *)
 		If[opts[MaxGradient] < \[Infinity] || opts[GradientTracker],
 			
-			grad = NGradient[func, point]	~rec~"Gradient";
+			grad = NGradient[energyf, point]	~rec~"Gradient";
 			
 			If[Norm[grad] > maxGradientTracker, maxGradientTracker=Norm[grad]];
 
