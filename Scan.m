@@ -189,7 +189,7 @@ Begin["`Private`"];
 		MinimalSurface -> False,
 		GradientTracker -> False,
 		MaxEVRatio->\[Infinity],
-		MaxDisplacementEnergy->\[Infinity],
+		MaxEnergy->\[Infinity],
 		MaxGradient->\[Infinity],
 		ReplacePoints->True,
 		LogFile->"",
@@ -409,10 +409,10 @@ Begin["`Private`"];
 			(* test *)
 			If[val > maxFuncValTracker, maxFuncValTracker = val];
 		
-			(* perform check only if opts[MaxDisplacementEnergy] is finite *)
-			If[opts[MaxDisplacementEnergy] < \[Infinity],
+			(* perform check only if opts[MaxEnergy] is finite *)
+			If[opts[MaxEnergy] < \[Infinity],
 				
-				If[val < opts[MaxDisplacementEnergy],
+				If[val < opts[MaxEnergy],
 					Return[False];
 				,
 					Return[True];

@@ -204,7 +204,7 @@ Begin["`Private`"];
 			AppendTo[status, { "Rejected pts (EVRatio)" , BProbe`Scan`Private`rejectedCounterRat }];
 		];
 		
-		If[opts[MaxDisplacementEnergy] < \[Infinity],
+		If[opts[MaxEnergy] < \[Infinity],
 			AppendTo[status, { "Rejected pts (FuncValue)" , BProbe`Scan`Private`rejectedCounterVal }];
 		];
 		

@@ -18,7 +18,7 @@ VerificationTest[ ProbeScan[0.8, Dimension->2]
 	, Null
 	, TestID -> "ProbeScan-Dimension"
 ];
-VerificationTest[ ProbeScan[0.8, ReplacePoints->False, MaxDisplacementEnergy->2.1]
+VerificationTest[ ProbeScan[0.8, ReplacePoints->False, MaxEnergy->2.1]
 	, Null
 	, TestID -> "ProbeScan-ReplacePoints"
 ];
@@ -26,9 +26,9 @@ VerificationTest[ ProbeScan[0.8, MinimalSurface->True]
 	, Null
 	, TestID -> "ProbeScan-MinimalSurface"
 ];
-VerificationTest[ ProbeScan[0.8, MaxDisplacementEnergy->2.1]
+VerificationTest[ ProbeScan[0.8, MaxEnergy->2.1]
 	, Null
-	, TestID -> "ProbeScan-MaxDisplacementEnergy"
+	, TestID -> "ProbeScan-MaxEnergy"
 ];
 VerificationTest[ ProbeScan[0.8, MaxEVRatio->0.1]
 	, Null
