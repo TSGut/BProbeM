@@ -55,13 +55,7 @@ Begin["`Private`"];
 		
 		inited=True; (* say: okay, we did a initialization *)
 		
-		Print[Panel[TextGrid[
-			info,
-			Dividers -> Center,
-			Alignment -> {{Right,Center},Table[Top,Length[info]]},
-			Spacings -> {3,2},
-			ItemSize -> {{Automatic, Automatic}}
-		]]];
+		Print[styleInitInfo[info]];
 	];
 	
 	Options[ProbeReset] = Options[BProbe`Scan`reset];
@@ -185,6 +179,37 @@ Begin["`Private`"];
 	(* so I need this ugly workaround *)
 	thisDirectory[] = DirectoryName[$InputFileName];
 
+	styleInitInfo[info_] := Block[{i,textgrid, hevs},
+		
+		hevs = info["HEigenvaluesSP"];
+		For[i=1,i<=Length[hevs],i++,
+			If[i <= info["BraneDimension"],
+				hevs[[i]] = Style[TextString[hevs[[i]]], Darker[Green]];
+			,
+				hevs[[i]] = Style[TextString[hevs[[i]]], Darker[Red]];
+			];
+		];
+	
+		textgrid = {
+			{ "Energy Probe", Style[info["EnergyProbe"], Bold] },
+			{ "Starting Point (SP)", MatrixForm[info["StartingPoint"]] },
+			{ "Energy at SP" , TextString[info["EnergySP"]] },
+			{ "Norm of Gradient at SP" , TextString[info["GradientSP"]] },
+			{ "Absolute Hessian Eigenvalues at SP", MatrixForm[hevs] },
+			{ "Local brane dimension at SP", Style[TextString[info["BraneDimension"]],{Darker[If[info["BraneDimension"]==0,Red,Green]],Bold}] },
+			{ "Dimension of Target Space", Style[TextString[info["TargetSpaceDimension"]],Bold] },
+			{ "Dimension of Hilbert Space", Style[TextString[info["HilbertSpaceDimension"]],Bold] }
+		};
+	
+		Return[Panel[TextGrid[
+			textgrid,
+			Dividers -> Center,
+			Alignment -> {{Right,Center},Table[Top,Length[info]]},
+			Spacings -> {3,2},
+			ItemSize -> {{Automatic, Automatic}}
+		]]];
+	];
+	
 	(* status message: accesses private variables of `Scan` *)
 	generateStatus[options:OptionsPattern[]] := Block[{status, points, tracker, rejections},
 		opts[symbol_] := OptionValue[BProbe`Scan`start, options, symbol];

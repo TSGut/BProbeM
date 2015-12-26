@@ -49,7 +49,7 @@ Begin["`Private`"];
 		Probe -> "Laplace",
 		Subspace -> Full
 	};
-	init[t_, opts:OptionsPattern[]] := Block[{info, evlist, i, subspace, obs, gdim},
+	init[t_, opts:OptionsPattern[]] := Block[{info, evlist, i, subspace, obs, gdim, hdim},
 
 		If[Not[ListQ[OptionValue[Subspace]]],
 			(* in this case, take the full space *)
@@ -64,9 +64,11 @@ Begin["`Private`"];
 		PrintTemporary["* Compiling expectation-value function ..."];
 		If[OptionValue["Probe"] == "Laplace",
 			obs = t;
+			hdim = Length[t[[1]]];
 		, If[OptionValue["Probe"] == "Dirac" || OptionValue["Probe"] == "DiracSq",
 			gdim = Length[MatrixRepGamma[Length[t]][[1]]];
 			obs = KroneckerProduct[IdentityMatrix[gdim],#]& /@ t;
+			hdim = Length[t[[1]]] * gdim;
 		]];
 		cexp = buildExpectationValue[obs[[subspace]]];
 
@@ -95,23 +97,21 @@ Begin["`Private`"];
 		For[i=1,i<=Length[evlist],i++,
 			If[evlist[[i]] < 0.3,
 				branedim += 1;
-				evlist[[i]] = Style[evlist[[i]], Darker[Green]]; (* and colorize for later *)
-			,
-				evlist[[i]] = Style[evlist[[i]], Darker[Red]];
 			];
 		];
 		
 		reset[opts];
 		
-		(* print info *)
-		info = {
-			{ "Energy Probe", Style[OptionValue[Probe], Bold] },
-			{ "Starting Point (SP)", MatrixForm[startPoint] },
-			{ "Energy at SP" , TextString[energyf[startPoint]] },
-			{ "Norm of Gradient at SP" , Norm[NGradient[energyf,startPoint]] },
-			{ "Absolute Hessian Eigenvalues at SP", MatrixForm[evlist] },
-			{ "Local brane dimension", Style[ToString[branedim],{Darker[If[branedim==0,Red,Green]],Bold}] }
-		};
+		info = <|
+			"EnergyProbe" -> OptionValue[Probe],
+			"StartingPoint" -> startPoint,
+			"EnergySP" -> energyf[startPoint],
+			"GradientSP" -> Norm[NGradient[energyf,startPoint]],
+			"HEigenvaluesSP" -> evlist,
+			"BraneDimension" -> branedim,
+			"TargetSpaceDimension" -> Length[subspace],
+			"HilbertSpaceDimension" -> hdim
+		|>;
 		
 		Return[info];
 	];
