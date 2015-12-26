@@ -34,6 +34,7 @@ BeginPackage["BProbe`"];
 	ProbeGetMinEigenvalue::usage = "";
 	ProbeGetEigenvalues::usage = "";
 	ProbeGetState::usage = "";
+	ProbeGetExpectedLocation::usage = "";
 	MatrixRepSU2::usage = "";
 	MatrixRepSU3::usage = "";
 	RunTests::usage = "";
@@ -53,6 +54,10 @@ Begin["`Private`"];
 		
 		info = BProbe`Scan`init[t, FilterRules[{opts}, Options[BProbe`Scan`init]]];
 		
+		dimTargetSpace = info["TargetSpaceDimension"];
+		dimBrane = info["BraneDimension"];
+		dimHilbert = info["HilbertSpaceDimension"];
+
 		inited=True; (* say: okay, we did a initialization *)
 		
 		Print[styleInitInfo[info]];
@@ -101,6 +106,18 @@ Begin["`Private`"];
 	
 	ProbeGetState[p_?(VectorQ[#,NumericQ]&)] := Block[{},
 		Return[BProbe`Scan`getState[p]];
+	] /; inited;
+	
+	ProbeGetExpectedLocation[state_?(VectorQ[#,NumericQ]&) /;
+		Length[state]==dimHilbert
+	] := Block[{},
+		Return[BProbe`Scan`getExpectedLocation[state]];
+	] /; inited;
+	
+	ProbeGetExpectedLocation[p_?(VectorQ[#,NumericQ]&) /;
+		Length[p]==dimTargetSpace
+	] := Block[{},
+		Return[BProbe`Scan`getExpectedLocation[BProbe`Scan`getState[p]]];
 	] /; inited;
 	
 	MatrixRepSU2[n_?NumericQ /; n>0] := Block[{},
@@ -304,6 +321,9 @@ End[];
 	ProbeGetEigenvalues::usage = BProbe`Private`header["ProbeGetEigenvalues", {{"List", "point"}}] <> " returns the eigenvalues of the (Laplace-/Dirac-) operator in question for a given point.";
 	
 	ProbeGetState::usage = BProbe`Private`header["ProbeGetState", {{"List", "point"}}] <> " returns the eigenvector corresponding to the minimal eigenvalue (with respect to the modulus) of the (Laplace-/Dirac-) operator in question for a given point.";
+	
+	ProbeGetExpectedLocation::usage = BProbe`Private`header["ProbeGetExpectedLocation", {{"List", "point"}}] <> " returns the expectation value of the quantized embedding functions corresponding to the ground state of the (Laplace-/Dirac-) operator in question for a given point.\n" <>
+	BProbe`Private`header["ProbeGetExpectedLocation", {{"List", "state"}}] <> " returns the expectation value of the quantized embedding functions for the given state.";
 	
 	MatrixRepSU2::usage = BProbe`Private`header["MatrixRepSU2", {{"Integer", "dimension"}}] <> " returns a " <> BProbe`Private`doc["List"] <> " of three matrices, constituting a specific matrix representation of SU(2) acting on a representation space of the dimension given as argument."
 	
