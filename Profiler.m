@@ -43,7 +43,7 @@ Begin["`Private`"];
 			AppendTo[profiles, id -> {}];
 		];
 		
-		timing = Timing[expr];
+		timing = AbsoluteTiming[expr];
 		AppendTo[profiles[id],timing[[1]]];
 		
 		Return[timing[[2]]];
