@@ -50,7 +50,7 @@ Begin["`Private`"];
 		Probe -> "Laplace",
 		Subspace -> Full
 	};
-	init[t_, opts:OptionsPattern[]] := Block[{info, evlist, i, subspace, obs, gdim, hdim},
+	init[t_, opts:OptionsPattern[]] := Block[{info, evlist, subspace, obs, gdim, hdim},
 
 		If[Not[ListQ[OptionValue[Subspace]]],
 			(* in this case, take the full space *)
@@ -95,11 +95,11 @@ Begin["`Private`"];
 		(* i.e. just check for eigenvalues < some small value *)
 		branedim = 0;
 		evlist = Sort[Abs[#]&/@ Eigenvalues[NHessian[energyf,startPoint, Scale -> 0.01]]];
-		For[i=1,i<=Length[evlist],i++,
-			If[evlist[[i]] < 0.3,
+		Scan[(
+			If[# < 0.3,
 				branedim += 1;
 			];
-		];
+		)&, evlist];
 		
 		reset[opts];
 		
@@ -197,7 +197,7 @@ Begin["`Private`"];
 		LogFile->"",
 		Profiling->False
 	}
-	start[ssize_, opts:OptionsPattern[]] := Block[{ppoint, cpoint, npoints, minpos, m, i},
+	start[ssize_, opts:OptionsPattern[]] := Block[{ppoint, cpoint, npoints},
 
 		step = ssize;
 		startOptions = opts;
@@ -271,7 +271,7 @@ Begin["`Private`"];
 	];
 
 
-	manipulatePoints[npoints_] := Block[{manpoints, i, p, f2, s},
+	manipulatePoints[npoints_] := Block[{manpoints, p, f2, s},
 			
 		manpoints = npoints;
 	
@@ -282,15 +282,12 @@ Begin["`Private`"];
 			f2[p__?NumericQ] := energyf[{p}];
 			p = Table[Unique["p"], {Length[npoints[[1]]]}];
 			
-			manpoints = Flatten[Reap[
-			For[i=1, i<=Length[npoints], i++,
-				
-				(Quiet[s = FindMinimum[f2 @@ p, Thread[{p,npoints[[i]]}]]])  ~rec~ "FindMinimum";
+			manpoints = Map[(
+				(Quiet[s = FindMinimum[f2 @@ p, Thread[{p,#}]]])  ~rec~ "FindMinimum";
 				(* , MaxIterations->5 *)
 				
-				Sow[(p /. s[[2]])];
-			]
-			][[2]],1];
+				(p /. s[[2]])
+			)&, npoints];
 		];
 		
 		(* if not deactivated *)
