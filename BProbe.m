@@ -137,7 +137,7 @@ Begin["`Private`"];
 	
 	(* runs all Tests specified in ./Tests/ *)
 	(****************************************)
-	RunTests[] := Block[{testdir, filenames, reports, report, i, allsucceeded, testcount, output, ptemp},
+	RunTests[] := Block[{testdir, filenames, reports, report, allsucceeded, testcount, output, ptemp},
 		
 		testcount = 0;
 		allsucceeded=True;
@@ -158,8 +158,7 @@ Begin["`Private`"];
 		]; (* Print and PrintTemporary are usable again at this point *)
 
 		
-		For[i=1,i<=Length[reports],i++,
-		
+		Do[
 			testcount += Length[reports[[i]]["TestResults"]];
 		
 			If[reports[[i]]["AllTestsSucceeded"]==False,
@@ -180,8 +179,7 @@ Begin["`Private`"];
 				], FileBaseName[filenames[[i]]] ]];
 			
 			];
-		
-		];
+		, {i, Length[reports]}];
 		
 		If[!allsucceeded,
 			Print["!!! Warning: Some tests failed !!!"];
@@ -196,16 +194,17 @@ Begin["`Private`"];
 	(* so I need this ugly workaround *)
 	thisDirectory[] = DirectoryName[$InputFileName];
 
-	styleInitInfo[info_] := Block[{i,textgrid, hevs},
+	styleInitInfo[info_] := Block[{textgrid, hevs},
 		
 		hevs = info["HEigenvaluesSP"];
-		For[i=1,i<=Length[hevs],i++,
-			If[i <= info["BraneDimension"],
-				hevs[[i]] = Style[TextString[hevs[[i]]], Darker[Green]];
+
+		Do[
+			hevs[[i]] = If[i <= info["BraneDimension"],
+				Style[TextString[hevs[[i]]], Darker[Green]]
 			,
-				hevs[[i]] = Style[TextString[hevs[[i]]], Darker[Red]];
+				Style[TextString[hevs[[i]]], Darker[Red]]
 			];
-		];
+		, {i, Length[hevs]}];
 	
 		textgrid = {
 			{ "Energy Probe", Style[info["EnergyProbe"], Bold] },
