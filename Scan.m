@@ -164,10 +164,9 @@ Begin["`Private`"];
 	
 		(* init stuff *)
 		ResetProfile[];
-		pointlist = {};
-		AppendTo[pointlist, startPoint];
-		boundary = new[Queue];
-		boundary.push[{startPoint,startPoint}];
+		pointlist = {startPoint};
+		
+		boundary = {{1,1}};
 	
 		rejectedCounterGrad = 0;
 		rejectedCounterVal = 0;
@@ -197,75 +196,70 @@ Begin["`Private`"];
 		LogFile->"",
 		Profiling->False
 	}
-	start[ssize_, opts:OptionsPattern[]] := Block[{ppoint, cpoint, npoints},
+	start[ssize_, opts:OptionsPattern[]] := Block[{ppoint, cpoint},
 
 		step = ssize;
 		startOptions = opts;
 		logger = new[Logger, OptionValue[LogFile]];
 
-		cpoint = Last[pointlist];
-		ppoint = Last[pointlist];
-
 
 		(* CORE *)
-		While[boundary.size[] != 0,
-			{ppoint, cpoint} = boundary.pop[];
+		While[Length[boundary] != 0, Block[{dirs, nboundary={}},
 			
+			dirs = determineDirections[pointlist[[Thread[boundary][[2]]]]];
 			
-			npoints = doStep[ppoint, cpoint];
+			Do[Block[{ppoint, cpoint, npoints},
 			
-			(* append new points, boundary info  + ppoints *)
-			boundary.pushList[Thread[{
-				Table[cpoint,{Length[npoints]}] ,
-				npoints
-			}]];
-			pointlist = Join[pointlist, npoints];
+				cpoint = pointlist[[boundary[[i,2]]]];
+				ppoint = pointlist[[boundary[[i,1]]]];
+				
+				npoints = (cpoint + #*step)& /@ dirs[[i]];
+				npoints = manipulatePoints[ npoints ];
+				npoints = filterPoints[ppoint, npoints];
+				
+				(* append new points, boundary info + ppoints *)
+				nboundary = Join[nboundary,
+					Thread[{ Table[boundary[[i,2]],{Length[npoints]}] , Length[pointlist] + Range[1,Length[npoints]] }]
+				];
+				pointlist = Join[pointlist, npoints];
+				
+				log[logger,
+					"point accepted -" <> TextString[#]
+				]& /@ npoints;
 			
-			log[logger,
-				"point accepted -" <> TextString[#]
-			]& /@ npoints;
+			],{i,Length[dirs]}];
 			
-		];
+			boundary = nboundary;
+		]];
 		
 		close[logger];
 		
 	];
 
-	(* [pastpoint, currentpoint] *)
-	doStep[ppoint_,cpoint_] :=  Block[{npoints,dirs},
-		
-		dirs = determineDirections[cpoint];
-		
-		npoints = (cpoint + #*step)& /@ dirs;
-		npoints = manipulatePoints[ npoints ];
-		npoints = filterPoints[ppoint, npoints];
 
-		Return[npoints];
-	];
-
-		
-		
 
 (* PRIVATE METHODS (informal) *)
 
-	determineDirections[point_] := Block[{nhess, directions},
-			
-		(nhess = NHessian[energyf, point, Scale -> step/10])	 ~rec~ "Hessian" ;
+	(* determine directions for a batch of points *)
+	determineDirections[points_] := Block[{nhess, directions},
 		
-		(* This should actually be checked in the "QValidDirection" method, but *)
-		(* then the hessian would have to be recalculated.. so for performance reasons ... *)
-		If[QEVRatioTooHigh[nhess],
-			log[logger, "point rejected (evratiotoohigh) -" <> TextString[TextString[point]]];
-			rejectedCounterRat += 1;
-			
-			Return[{}];
-		];
+		(nhess = Map[(
+			NHessian[energyf, #, Scale -> step/10]
+		)&, points]) ~rec~ "Hessian" ;
 		
 		(* directions from Hessian *)
-		(directions = Eigenvectors[nhess, -opts[Dimension]])	~rec~ "Eigenvectors";
+		(directions = Map[(
+			If[!QEVRatioTooHigh[#],
+				Eigenvectors[#, -opts[Dimension]]
+			,
+				log[logger, "point rejected (evratiotoohigh) -" <> TextString[TextString[point]]];
+				rejectedCounterRat += 1;
+				{}
+			]
+		)&, nhess])	~rec~ "Eigenvectors";
 		
 		(* double them (forward, backward) *)
-		directions = Riffle[directions, -directions];
+		directions = Map[Riffle[#, -#]&, directions];
 		
 		Return[directions];
 	];
