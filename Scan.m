@@ -42,7 +42,6 @@ BeginPackage["BProbe`Scan`"];
 Begin["`Private`"];
 
 	Get["BProbe`Logger`"];
-	Get["BProbe`Queue`"];
 
 
 	Options[init] = {
