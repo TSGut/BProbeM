@@ -307,7 +307,7 @@ Begin["`Private`"];
 	];
 
 
-	manipulatePoints[npoints_] := Block[{manpoints, p, f2, s},
+	manipulatePoints[npoints_] := Block[{manpoints, p, f2},
 			
 		manpoints = npoints;
 	
@@ -318,12 +318,18 @@ Begin["`Private`"];
 			f2[p__?NumericQ] := energyf[{p}];
 			p = Table[Unique["p"], {Length[npoints[[1]]]}];
 			
-			manpoints = Map[(
-				(Quiet[s = FindMinimum[f2 @@ p, Thread[{p,#}]]])  ~rec~ "FindMinimum";
-				(* , MaxIterations->5 *)
-				
-				(p /. s[[2]])
-			)&, npoints];
+			If[opts[Parallelize],
+				DistributeDefinitions[f2,p];
+				manpoints = ParallelMap[Block[{s},
+					(Quiet[s = FindMinimum[f2 @@ p, Thread[{p,#}]]]);
+					(p /. s[[2]])
+				]&, npoints] ~rec~ "FindMinimumParallel";
+			,
+				manpoints = Map[(
+					(Quiet[s = FindMinimum[f2 @@ p, Thread[{p,#}]]]);
+					(p /. s[[2]])
+				)&, npoints] ~rec~ "FindMinimum";
+			];
 		];
 		
 		(* if not deactivated *)
