@@ -41,9 +41,6 @@ BeginPackage["BProbe`Scan`"];
 
 Begin["`Private`"];
 
-	Get["BProbe`Logger`"];
-
-
 	Options[init] = {
 		StartingPoint -> "min",
 		Probe -> "Laplace",
@@ -192,14 +189,12 @@ Begin["`Private`"];
 		MaxEnergy->\[Infinity],
 		MaxGradient->\[Infinity],
 		ReplacePoints->True,
-		LogFile->"",
 		Profiling->False
 	}
 	start[ssize_, opts:OptionsPattern[]] := Block[{ppoint, cpoint},
 
 		step = ssize;
 		startOptions = opts;
-		logger = new[Logger, OptionValue[LogFile]];
 
 
 		(* CORE *)
@@ -264,13 +259,8 @@ Begin["`Private`"];
 			,
 				boundary = {};
 			];
-			
-			(* log *)
-			Scan[ log[logger, "point accepted -" <> TextString[#[[2]]] ]&, boundary];
 
 		]];
-		
-		close[logger];
 		
 	];
 
@@ -290,7 +280,6 @@ Begin["`Private`"];
 			If[!QEVRatioTooHigh[#],
 				Eigenvectors[#, -opts[Dimension]]
 			,
-				log[logger, "point rejected (evratiotoohigh) -" <> TextString[TextString[point]]];
 				rejectedCounterRat += 1;
 				{}
 			]
@@ -341,21 +330,11 @@ Begin["`Private`"];
 				If[Not[QGradientTooHigh[npoint]],
 					Return[True];
 				,
-					log[logger,
-						"point rejected (gradienttoohigh) -" <>
-						TextString[npoint] <> "-" <> TextString[ppoint]];
 					rejectedCounterGrad += 1;
 				];
 			,
-				log[logger,
-					"point rejected (valuetoohigh) -" <>
-					TextString[energyf[npoint]] <> "-" <> TextString[npoint] <> "-" <> TextString[ppoint]];
 				rejectedCounterVal += 1;
 			];
-		,
-			log[logger,
-				"point rejected (back) -" <>
-				TextString[npoint] <> "-" <> TextString[ppoint]];
 		];
 
 		(*otherwise*)
