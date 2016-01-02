@@ -50,6 +50,10 @@ VerificationTest[ ProbeScan[0.8, EnergyTracker->True]
 	, Null
 	, TestID -> "ProbeScan-EnergyTracker"
 ];
+VerificationTest[ ProbeScan[0.8, EVTracker->True]
+	, Null
+	, TestID -> "ProbeScan-EVTracker"
+];
 VerificationTest[ ProbeScan[0.8, Parallelize->False]
 	, Null
 	, TestID -> "ProbeScan-Parallelize"
