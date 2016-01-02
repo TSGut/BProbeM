@@ -198,8 +198,8 @@ Begin["`Private`"];
 		step = ssize;
 		startOptions = opts;
 
-		If[opts[Parallelize],
-			LaunchKernels[];
+		If[OptionValue[Parallelize],
+			Quiet[LaunchKernels[]];
 			DistributeDefinitions[getState, energyf, expvfunc, NHessian];
 			DistributeDefinitions[step];
 		];
