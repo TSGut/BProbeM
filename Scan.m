@@ -203,32 +203,71 @@ Begin["`Private`"];
 
 
 		(* CORE *)
-		While[Length[boundary] != 0, Block[{dirs, nboundary={}},
+		While[Length[boundary] != 0, Block[{dirs, npoints, nearf},
 			
 			dirs = determineDirections[pointlist[[Thread[boundary][[2]]]]];
 			
-			Do[Block[{ppoint, cpoint, npoints},
-			
+			(* gather all potential new points *)
+			(*---------------------------------------------*)
+			npoints = Reap[Do[Block[{cpoint},
 				cpoint = pointlist[[boundary[[i,2]]]];
-				ppoint = pointlist[[boundary[[i,1]]]];
-				
-				npoints = (cpoint + #*step)& /@ dirs[[i]];
-				npoints = manipulatePoints[ npoints ];
-				npoints = filterPoints[ppoint, npoints];
-				
-				(* append new points, boundary info + ppoints *)
-				nboundary = Join[nboundary,
-					Thread[{ Table[boundary[[i,2]],{Length[npoints]}] , Length[pointlist] + Range[1,Length[npoints]] }]
-				];
-				pointlist = Join[pointlist, npoints];
-				
-				log[logger,
-					"point accepted -" <> TextString[#]
-				]& /@ npoints;
+				Sow[{ i, (cpoint + #*step) }]& /@ dirs[[i]]
+			], {i, Length[dirs]}]][[2,1]] ~rec~ "Gathering new points";
 			
-			],{i,Length[dirs]}];
+			(* manipulate new points *)
+			(*---------------------------------------------*)
+			npoints = Thread[{Thread[npoints][[1]], manipulatePoints[ Thread[npoints][[2]] ]}];
 			
-			boundary = nboundary;
+			(* filter all points: qback, qenergy, qgradient *)
+			(*---------------------------------------------*)
+			npoints = Map[Block[{ppoint, cpoint, npoint},
+				npoint = #[[2]];
+				cpoint = pointlist[[boundary[[#[[1]]]][[2]]]];
+				ppoint = pointlist[[boundary[[#[[1]]]][[1]]]];
+				
+				If[QValidPoint[ppoint, npoint],
+					{ #[[1]] , npoint }
+				,
+					Nothing
+				]
+			]&,npoints] ~rec~ "Filtering";
+			
+			(* NNS - first check on existing points *)
+			(*---------------------------------------------*)
+			nearf = Nearest[pointlist];
+			npoints = Map[Block[{npoint},
+				npoint = #[[2]];
+				If[Length[nearf[npoint,{1,step*0.3}]] == 0,
+					{ #[[1]] , npoint }
+				,
+					Nothing
+				]
+			]&, npoints] ~rec~ "NNS-1";
+			
+			(* NNS - second check on new points *)
+			(*---------------------------------------------*)
+			Block[{nnpoints=npoints},
+				npoints = {};
+				Scan[(
+					If[Length[npoints]==0 || Length[Nearest[Thread[npoints][[2]], #[[2]] ,{1,step*0.3}]] == 0,
+						AppendTo[npoints, { #[[1]], #[[2]] }];
+					];
+				)&, nnpoints];
+			] ~rec~ "NNS-2";
+			
+			(* shovel all new points into boundary *)
+			(*---------------------------------------------*)
+			npoints = Map[{ boundary[[#[[1]]]][[2]] , #[[2]] }&, npoints];
+			If[Length[npoints] != 0,
+				boundary = Thread[{ Thread[npoints][[1]], Length[pointlist] + Range[1,Length[npoints]] }];
+				pointlist = Join[pointlist, Thread[npoints][[2]]];
+			,
+				boundary = {};
+			];
+			
+			(* log *)
+			Scan[ log[logger, "point accepted -" <> TextString[#[[2]]] ]&, boundary];
+
 		]];
 		
 		close[logger];
@@ -295,28 +334,12 @@ Begin["`Private`"];
 	];
 
 
-	filterPoints[ppoint_,npoints_] := Block[{filtered},
-
-		filtered = Flatten[Reap[
-			(If[QValidPoint[ppoint, #], Sow[#]])& /@ npoints;
-		][[2]],1];
-		
-		Return[filtered];
-	];
-
-
 	QValidPoint[ppoint_,npoint_] := Block[{},
 		
 		If[Not[QBack[ppoint, npoint]],
 			If[Not[QEnergyTooHigh[npoint]],
 				If[Not[QGradientTooHigh[npoint]],
-					If[Not[QNearPoints[npoint]],
-						Return[True];
-					,
-						log[logger,
-							"point rejected (nearpoints) -" <>
-							TextString[npoint] <> "-" <> TextString[ppoint]];
-					];
+					Return[True];
 				,
 					log[logger,
 						"point rejected (gradienttoohigh) -" <>
@@ -404,16 +427,8 @@ Begin["`Private`"];
 	(* Are we going back again? *)
 	QBack[ppoint_,npoint_]:= (* [pastpoint, newpoint] *)
 		Norm[npoint-ppoint] < step*0.7;		(* TODO: check if this makes sense in all poss. configs *)
-
-
-	QNearPoints[point_] := Block[{near},
-		
-		near = Nearest[pointlist,point,{1,step*0.3}]	~rec~"NNS" ;
-		
-		Return[Length[near] != 0];
-		
-	];
-		
+	
+	
 	opts[symbol_] := OptionValue[start, startOptions, symbol];
 	
 	SetAttributes[rec, HoldFirst];
