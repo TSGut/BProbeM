@@ -222,6 +222,7 @@ Begin["`Private`"];
 			
 			(* filter all points: qback, qenergy, qgradient *)
 			(*---------------------------------------------*)
+			(* TODO: parallel processing for gradients, etc.. *)
 			npoints = Map[Block[{ppoint, cpoint, npoint},
 				npoint = #[[2]];
 				cpoint = pointlist[[boundary[[#[[1]]]][[2]]]];
