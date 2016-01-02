@@ -47,7 +47,7 @@ Begin["`Private`"];
 		Subspace -> Full
 	};
 	init[t_, opts:OptionsPattern[]] := Block[{info, evlist, subspace, obs, gdim, hdim},
-
+		
 		If[Not[ListQ[OptionValue[Subspace]]],
 			(* in this case, take the full space *)
 			subspace = Range[1, Length[t]];
@@ -170,6 +170,7 @@ Begin["`Private`"];
 		maxEnergyTracker = 0;
 		maxEVRatioTracker = 0;
 		maxGradientTracker = 0;
+		
 	];
 	
 	
@@ -189,6 +190,7 @@ Begin["`Private`"];
 		MaxEnergy->\[Infinity],
 		MaxGradient->\[Infinity],
 		ReplacePoints->True,
+		Parallelize->True,
 		Profiling->False
 	}
 	start[ssize_, opts:OptionsPattern[]] := Block[{ppoint, cpoint},
@@ -196,6 +198,11 @@ Begin["`Private`"];
 		step = ssize;
 		startOptions = opts;
 
+		If[opts[Parallelize],
+			LaunchKernels[];
+			DistributeDefinitions[getState, energyf, expvfunc, NHessian];
+			DistributeDefinitions[step];
+		];
 
 		(* CORE *)
 		While[Length[boundary] != 0, Block[{dirs, npoints, nearf},
@@ -271,9 +278,15 @@ Begin["`Private`"];
 	(* determine directions for a batch of points *)
 	determineDirections[points_] := Block[{nhess, directions},
 		
-		(nhess = Map[(
-			NHessian[energyf, #, Scale -> step/10]
-		)&, points]) ~rec~ "Hessian" ;
+		If[opts[Parallelize],
+			(nhess = ParallelMap[(
+				NHessian[energyf, #, Scale -> step/10]
+			)&, points]) ~rec~ "HessianParallel" ;
+		,
+			(nhess = Map[(
+				NHessian[energyf, #, Scale -> step/10]
+			)&, points]) ~rec~ "Hessian" ;
+		];
 		
 		(* directions from Hessian *)
 		(directions = Map[(
@@ -314,9 +327,12 @@ Begin["`Private`"];
 		(* if not deactivated *)
 		(* replace points by their corresponding expectation values *)
 		If[opts[ReplacePoints],
-			(manpoints = expvfunc[#]& /@ npoints)	~rec~"ReplacePoints";
+			If[opts[Parallelize],
+				(manpoints = ParallelMap[expvfunc[#]&, npoints])	~rec~ "ReplacePointsParallel";
+			,
+				(manpoints = expvfunc[#]& /@ npoints)	~rec~"ReplacePoints";
+			];
 		];
-		
 		
 		Return[manpoints];
 		
