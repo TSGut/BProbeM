@@ -238,7 +238,7 @@ Begin["`Private`"];
 			
 			(* NNS - first check on existing points *)
 			(*---------------------------------------------*)
-			(nearf = Nearest[pointlist];
+			nearf = Nearest[pointlist] ~rec~ "NNS-0";
 			npoints = Map[Block[{npoint},
 				npoint = #[[2]];
 				If[Length[nearf[npoint,{1,step*0.3}]] == 0,
@@ -246,7 +246,7 @@ Begin["`Private`"];
 				,
 					Nothing
 				]
-			]&, npoints];) ~rec~ "NNS-1";
+			]&, npoints] ~rec~ "NNS-1";
 			
 			(* NNS - second check on new points *)
 			(*---------------------------------------------*)
