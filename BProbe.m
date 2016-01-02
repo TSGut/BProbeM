@@ -244,6 +244,10 @@ Begin["`Private`"];
 			If[opts[EnergyTracker] || (opts[MaxEnergy] < \[Infinity]),
 				Sow[{ "Maximal Occured Displacement Energy" , BProbe`Scan`Private`maxEnergyTracker }];
 			];
+			
+			If[opts[EVTracker] || (opts[MaxEVRatio] < \[Infinity]),
+				Sow[{ "Maximal Occured 'small' Eigenvalue" , BProbe`Scan`Private`maxEVTracker }];
+			];
 		][[2]],1];
 		
 		rejections = Flatten[Reap[

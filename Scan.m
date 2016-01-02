@@ -168,7 +168,7 @@ Begin["`Private`"];
 		rejectedCounterVal = 0;
 		rejectedCounterRat = 0;
 		maxEnergyTracker = 0;
-		maxEVRatioTracker = 0;
+		maxEVTracker = 0;
 		maxGradientTracker = 0;
 		
 	];
@@ -186,6 +186,7 @@ Begin["`Private`"];
 		MinimalSurface -> False,
 		GradientTracker -> False,
 		EnergyTracker -> False,
+		EVTracker -> False,
 		MaxEVRatio->\[Infinity],
 		MaxEnergy->\[Infinity],
 		MaxGradient->\[Infinity],
@@ -291,7 +292,7 @@ Begin["`Private`"];
 		
 		(* directions from Hessian *)
 		(directions = Map[(
-			If[!QEVRatioTooHigh[#],
+			If[!QEVTooHigh[#],
 				Eigenvectors[#, -opts[Dimension]]
 			,
 				rejectedCounterRat += 1;
@@ -359,26 +360,14 @@ Begin["`Private`"];
 	];
 
 
-	QEVRatioTooHigh[nhess_] := Block[{evs, ratio},
+	QEVTooHigh[nhess_] := Block[{evs, ratio},
 		
-		(* test *)
-		evs = Eigenvalues[nhess, -(opts[Dimension]+1)];
-		ratio = evs[[2]]/evs[[1]];
-		
-		If[ratio > maxEVRatioTracker, maxEVRatioTracker = ratio];
-	
-	
 		(* perform check only if evratio is finite *)
-		If[opts[MaxEVRatio] < \[Infinity],
-	
-
-		
-			If[ratio < opts[MaxEVRatio],
-				Return[False];	
-			,
-				Return[True];
-			];
-		
+		If[opts[MaxEVRatio] < \[Infinity] || opts[EVTracker],
+			evs = Eigenvalues[nhess, -opts[Dimension]];
+			If[evs[[1]] > maxEVTracker, maxEVTracker = evs[[1]]];
+			
+			Return[evs[[1]] > opts[MaxEVRatio]];
 		,
 			Return[False];
 		];
