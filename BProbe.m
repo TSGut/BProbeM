@@ -231,8 +231,8 @@ Begin["`Private`"];
 		opts[symbol_] := OptionValue[BProbe`Scan`start, options, symbol];
 	
 		points = {
-			{ "Number of Total Points Gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },
-			{ "Number of Points in Queue To Process" , Length[BProbe`Scan`Private`boundary] }
+			{ "Number of total points gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },
+			{ "Number of points currently processed" , Length[BProbe`Scan`Private`boundary] }
 (*			{ "Maximal Occured Eigenvalue-Ratio" , BProbe`Scan`Private`maxEVRatioTracker }*)
 		};
 		
