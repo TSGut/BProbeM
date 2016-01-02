@@ -30,9 +30,9 @@ VerificationTest[ ProbeScan[0.8, MaxEnergy->2.1]
 	, Null
 	, TestID -> "ProbeScan-MaxEnergy"
 ];
-VerificationTest[ ProbeScan[0.8, MaxEVRatio->0.1]
+VerificationTest[ ProbeScan[0.8, MaxEV->0.1]
 	, Null
-	, TestID -> "ProbeScan-MaxEVRatio"
+	, TestID -> "ProbeScan-MaxEV"
 ];
 VerificationTest[ ProbeScan[0.8, MaxGradient->0.1]
 	, Null

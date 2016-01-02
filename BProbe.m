@@ -233,7 +233,7 @@ Begin["`Private`"];
 		points = {
 			{ "Number of total points gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },
 			{ "Number of points currently processing" , Length[BProbe`Scan`Private`boundary] }
-(*			{ "Maximal Occured Eigenvalue-Ratio" , BProbe`Scan`Private`maxEVRatioTracker }*)
+(*			{ "Maximal Occured Eigenvalue-Ratio" , BProbe`Scan`Private`MaxEVTracker }*)
 		};
 		
 		tracker = Flatten[Reap[
@@ -245,13 +245,13 @@ Begin["`Private`"];
 				Sow[{ "Highest emerged Displacement Energy" , TextString[BProbe`Scan`Private`maxEnergyTracker] }];
 			];
 			
-			If[opts[EVTracker] || (opts[MaxEVRatio] < \[Infinity]),
+			If[opts[EVTracker] || (opts[MaxEV] < \[Infinity]),
 				Sow[{ "Highest emerged 'small' Eigenvalue" , TextString[BProbe`Scan`Private`maxEVTracker] }];
 			];
 		][[2]],1];
 		
 		rejections = Flatten[Reap[
-			If[opts[MaxEVRatio] < \[Infinity],
+			If[opts[MaxEV] < \[Infinity],
 				Sow[{ "Rejected Points (EVRatio)" , BProbe`Scan`Private`rejectedCounterRat }];
 			];
 			

@@ -187,7 +187,7 @@ Begin["`Private`"];
 		GradientTracker -> False,
 		EnergyTracker -> False,
 		EVTracker -> False,
-		MaxEVRatio->\[Infinity],
+		MaxEV->\[Infinity],
 		MaxEnergy->\[Infinity],
 		MaxGradient->\[Infinity],
 		ReplacePoints->True,
@@ -363,11 +363,11 @@ Begin["`Private`"];
 	QEVTooHigh[nhess_] := Block[{evs, ratio},
 		
 		(* perform check only if evratio is finite *)
-		If[opts[MaxEVRatio] < \[Infinity] || opts[EVTracker],
+		If[opts[MaxEV] < \[Infinity] || opts[EVTracker],
 			evs = Eigenvalues[nhess, -opts[Dimension]];
 			If[evs[[1]] > maxEVTracker, maxEVTracker = evs[[1]]];
 			
-			Return[evs[[1]] > opts[MaxEVRatio]];
+			Return[evs[[1]] > opts[MaxEV]];
 		,
 			Return[False];
 		];
