@@ -212,14 +212,16 @@ Begin["`Private`"];
 			
 			(* gather all potential new points *)
 			(*---------------------------------------------*)
-			npoints = Reap[Do[Block[{cpoint},
+			npoints = Flatten[Reap[Do[Block[{cpoint},
 				cpoint = pointlist[[boundary[[i,2]]]];
 				Sow[{ i, (cpoint + #*step) }]& /@ dirs[[i]]
-			], {i, Length[dirs]}]][[2,1]] ~rec~ "Gathering new points";
+			], {i, Length[dirs]}]][[2]],1] ~rec~ "Gathering new points";
 			
 			(* manipulate new points *)
 			(*---------------------------------------------*)
-			npoints = Thread[{Thread[npoints][[1]], manipulatePoints[ Thread[npoints][[2]] ]}];
+			If[Length[npoints]>0,
+				npoints = Thread[{Thread[npoints][[1]], manipulatePoints[ Thread[npoints][[2]] ]}];
+			];
 			
 			(* filter all points: qback, qenergy, qgradient *)
 			(*---------------------------------------------*)
