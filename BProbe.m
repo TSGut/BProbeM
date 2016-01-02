@@ -238,15 +238,15 @@ Begin["`Private`"];
 		
 		tracker = Flatten[Reap[
 			If[opts[GradientTracker] || (opts[MaxGradient] < \[Infinity]),
-				Sow[{ "Maximal Occured Norm of Gradient" , BProbe`Scan`Private`maxGradientTracker }];
+				Sow[{ "Highest emerged Norm of Gradient" , TextString[BProbe`Scan`Private`maxGradientTracker] }];
 			];
 			
 			If[opts[EnergyTracker] || (opts[MaxEnergy] < \[Infinity]),
-				Sow[{ "Maximal Occured Displacement Energy" , BProbe`Scan`Private`maxEnergyTracker }];
+				Sow[{ "Highest emerged Displacement Energy" , TextString[BProbe`Scan`Private`maxEnergyTracker] }];
 			];
 			
 			If[opts[EVTracker] || (opts[MaxEVRatio] < \[Infinity]),
-				Sow[{ "Maximal Occured 'small' Eigenvalue" , BProbe`Scan`Private`maxEVTracker }];
+				Sow[{ "Highest emerged 'small' Eigenvalue" , TextString[BProbe`Scan`Private`maxEVTracker] }];
 			];
 		][[2]],1];
 		
