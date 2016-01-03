@@ -35,6 +35,7 @@ BeginPackage["BProbe`"];
 	ProbeGetEigenvalues::usage = "";
 	ProbeGetState::usage = "";
 	ProbeGetExpectedLocation::usage = "";
+	ProbeGetStates::usage = "";
 	MatrixRepSU2::usage = "";
 	MatrixRepSU3::usage = "";
 	RunTests::usage = "";
@@ -46,6 +47,7 @@ Begin["`Private`"];
 	Get[ "BProbe`Scan`" ];
 	Get[ "BProbe`SU2Gen`" ];
 	Get[ "BProbe`SU3Gen`" ];
+	Get[ "BProbe`PHelper`" ];
 	
 
 	Options[ProbeInit] = Options[BProbe`Scan`init];
@@ -106,6 +108,23 @@ Begin["`Private`"];
 	
 	ProbeGetState[p_?(VectorQ[#,NumericQ]&)] := Block[{},
 		Return[BProbe`Scan`getState[p]];
+	] /; inited;
+	
+	ProbeGetStates[] := Block[{progress},
+		If[!IntegerQ[plHash] || Hash[BProbe`Scan`getList[]] != plHash,
+			PrintTemporary["* Generate ground states ... ", ProgressIndicator[Dynamic[progress]]];
+			
+			Quiet[LaunchKernels[]];
+			DistributeDefinitions[BProbe`Scan`getState];
+			
+			states = PPMap[(
+				BProbe`Scan`getState[#]
+			)&, BProbe`Scan`getList[], progress, 100];
+			
+			plHash = Hash[BProbe`Scan`getList[]];
+		];
+		
+		Return[states];
 	] /; inited;
 	
 	ProbeGetExpectedLocation[state_?(VectorQ[#,NumericQ]&) /;
@@ -323,6 +342,8 @@ End[];
 	ProbeGetEigenvalues::usage = BProbe`Private`header["ProbeGetEigenvalues", {{"List", "point"}}] <> " returns the eigenvalues of the (Laplace-/Dirac-) operator in question for a given point.";
 	
 	ProbeGetState::usage = BProbe`Private`header["ProbeGetState", {{"List", "point"}}] <> " returns the eigenvector corresponding to the minimal eigenvalue (with respect to the modulus) of the (Laplace-/Dirac-) operator in question for a given point.";
+	
+	ProbeGetStates::usage = BProbe`Private`header["ProbeGetStates", {}] <> " returns the ground states of the (Laplace-/Dirac-) operator for all points given by " <>  BProbe`Private`header["ProbeGetPointList", {}] <> "."
 	
 	ProbeGetExpectedLocation::usage = BProbe`Private`header["ProbeGetExpectedLocation", {{"List", "point"}}] <> " returns the expectation value of the quantized embedding functions corresponding to the ground state of the (Laplace-/Dirac-) operator in question for a given point.\n" <>
 	BProbe`Private`header["ProbeGetExpectedLocation", {{"List", "state"}}] <> " returns the expectation value of the quantized embedding functions for the given state.";
