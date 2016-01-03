@@ -32,7 +32,7 @@ BeginPackage["BProbe`"];
 	ProbeGetPointList::usage = "";
 	ProbeReset::usage = "";
 	ProbeGetGroundstateEnergy::usage = "";
-	ProbeGetEigenvalues::usage = "";
+	ProbeGetEnergies::usage = "";
 	ProbeGetState::usage = "";
 	ProbeGetExpectedLocation::usage = "";
 	ProbeGetStates::usage = "";
@@ -102,7 +102,7 @@ Begin["`Private`"];
 		Return[BProbe`Scan`getMinEigenvalue[p]];
 	] /; inited;
 	
-	ProbeGetEigenvalues[p_?(VectorQ[#,NumericQ]&)] := Block[{},
+	ProbeGetEnergies[p_?(VectorQ[#,NumericQ]&)] := Block[{},
 		Return[BProbe`Scan`getEigenvalues[p]];
 	] /; inited;
 	
@@ -339,7 +339,7 @@ End[];
 	
 	ProbeGetGroundstateEnergy::usage = BProbe`Private`header["ProbeGetGroundstateEnergy", {{"List", "point"}}] <> " returns the ground state energy of the (Laplace-/Dirac-) operator in question for a given point.";
 	
-	ProbeGetEigenvalues::usage = BProbe`Private`header["ProbeGetEigenvalues", {{"List", "point"}}] <> " returns the eigenvalues of the (Laplace-/Dirac-) operator in question for a given point.";
+	ProbeGetEnergies::usage = BProbe`Private`header["ProbeGetEnergies", {{"List", "point"}}] <> " returns the energies of the (Laplace-/Dirac-) operator in question for a given point.";
 	
 	ProbeGetState::usage = BProbe`Private`header["ProbeGetState", {{"List", "point"}}] <> " returns the ground state of the (Laplace-/Dirac-) operator in question for a given point.";
 	
