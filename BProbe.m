@@ -35,7 +35,7 @@ BeginPackage["BProbe`"];
 	ProbeGetEnergies::usage = "";
 	ProbeGetState::usage = "";
 	ProbeGetExpectedLocation::usage = "";
-	ProbeGetStates::usage = "";
+	ProbeGetGroundstates::usage = "";
 	MatrixRepSU2::usage = "";
 	MatrixRepSU3::usage = "";
 	RunTests::usage = "";
@@ -110,7 +110,7 @@ Begin["`Private`"];
 		Return[BProbe`Scan`getState[p]];
 	] /; inited;
 	
-	ProbeGetStates[] := Block[{progress},
+	ProbeGetGroundstates[] := Block[{progress},
 		If[!IntegerQ[plHash] || Hash[BProbe`Scan`getList[]] != plHash,
 			PrintTemporary["* Generate ground states ... ", ProgressIndicator[Dynamic[progress]]];
 			
@@ -343,7 +343,7 @@ End[];
 	
 	ProbeGetState::usage = BProbe`Private`header["ProbeGetState", {{"List", "point"}}] <> " returns the ground state of the (Laplace-/Dirac-) operator in question for a given point.";
 	
-	ProbeGetStates::usage = BProbe`Private`header["ProbeGetStates", {}] <> " returns the ground states of the (Laplace-/Dirac-) operator for all points given by " <>  BProbe`Private`header["ProbeGetPointList", {}] <> "."
+	ProbeGetGroundstates::usage = BProbe`Private`header["ProbeGetGroundstates", {}] <> " returns the ground states of the (Laplace-/Dirac-) operator for all points given by " <>  BProbe`Private`header["ProbeGetPointList", {}] <> "."
 	
 	ProbeGetExpectedLocation::usage = BProbe`Private`header["ProbeGetExpectedLocation", {{"List", "point"}}] <> " returns the expectation value of the quantized embedding functions corresponding to the ground state of the (Laplace-/Dirac-) operator in question for a given point.\n" <>
 	BProbe`Private`header["ProbeGetExpectedLocation", {{"List", "state"}}] <> " returns the expectation value of the quantized embedding functions for the given state.";
