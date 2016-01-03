@@ -169,3 +169,21 @@ VerificationTest[ProbeGetPointList[]
 		Return[same];
 	]]
 ];
+
+ProbeInit[PauliMatrix[{1,2,3}],StartingPoint->{1,0,0}];
+ProbeScan[0.8, MaxEV -> 0.001];
+VerificationTest[ProbeGetPointList[]
+	,{{1, 0, 0}}
+	,TestID->"ProbeScan-FuzzySphere-MaxEV"
+	, SameTest -> Function[{list1,list2}, Block[{i, same},
+		same = True;
+		
+		For[i=1,i<=Length[list1],i++,
+			If[Norm[list1[[i]]-list2[[i]]] > 10^-4,
+			same = False;
+			];
+		];
+	
+		Return[same];
+	]]
+];
