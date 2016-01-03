@@ -31,7 +31,7 @@ BeginPackage["BProbe`"];
 	ProbeScan::usage = "";
 	ProbeGetPointList::usage = "";
 	ProbeReset::usage = "";
-	ProbeGetMinEigenvalue::usage = "";
+	ProbeGetGroundstateEnergy::usage = "";
 	ProbeGetEigenvalues::usage = "";
 	ProbeGetState::usage = "";
 	ProbeGetExpectedLocation::usage = "";
@@ -98,7 +98,7 @@ Begin["`Private`"];
 		Return[BProbe`Scan`getList[]];
 	] /; inited;
 	
-	ProbeGetMinEigenvalue[p_?(VectorQ[#,NumericQ]&)] := Block[{},
+	ProbeGetGroundstateEnergy[p_?(VectorQ[#,NumericQ]&)] := Block[{},
 		Return[BProbe`Scan`getMinEigenvalue[p]];
 	] /; inited;
 	
@@ -337,7 +337,7 @@ End[];
 	
 	ProbeReset::usage = BProbe`Private`header["ProbeReset",{}] <> " resets the package in a way, so that the command " <> BProbe`Private`header["ProbeScan", {{"Integer", "dimension"}, {"Real", "step size"}}] <> " starts a completely new calculation.";
 	
-	ProbeGetMinEigenvalue::usage = BProbe`Private`header["ProbeGetMinEigenvalue", {{"List", "point"}}] <> " returns the minimal eigenvalue (with respect to the modulus) of the (Laplace-/Dirac-) operator in question for a given point.";
+	ProbeGetGroundstateEnergy::usage = BProbe`Private`header["ProbeGetGroundstateEnergy", {{"List", "point"}}] <> " returns the minimal eigenvalue (with respect to the modulus) of the (Laplace-/Dirac-) operator in question for a given point.";
 	
 	ProbeGetEigenvalues::usage = BProbe`Private`header["ProbeGetEigenvalues", {{"List", "point"}}] <> " returns the eigenvalues of the (Laplace-/Dirac-) operator in question for a given point.";
 	
