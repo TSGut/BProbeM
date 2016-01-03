@@ -233,7 +233,6 @@ Begin["`Private`"];
 		points = {
 			{ "Number of total points gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },
 			{ "Number of points currently processing" , Length[BProbe`Scan`Private`boundary] }
-(*			{ "Maximal Occured Eigenvalue-Ratio" , BProbe`Scan`Private`MaxEVTracker }*)
 		};
 		
 		tracker = Flatten[Reap[
