@@ -341,7 +341,7 @@ End[];
 	
 	ProbeGetEigenvalues::usage = BProbe`Private`header["ProbeGetEigenvalues", {{"List", "point"}}] <> " returns the eigenvalues of the (Laplace-/Dirac-) operator in question for a given point.";
 	
-	ProbeGetState::usage = BProbe`Private`header["ProbeGetState", {{"List", "point"}}] <> " returns the eigenvector corresponding to the minimal eigenvalue (with respect to the modulus) of the (Laplace-/Dirac-) operator in question for a given point.";
+	ProbeGetState::usage = BProbe`Private`header["ProbeGetState", {{"List", "point"}}] <> " returns the ground state of the (Laplace-/Dirac-) operator in question for a given point.";
 	
 	ProbeGetStates::usage = BProbe`Private`header["ProbeGetStates", {}] <> " returns the ground states of the (Laplace-/Dirac-) operator for all points given by " <>  BProbe`Private`header["ProbeGetPointList", {}] <> "."
 	
