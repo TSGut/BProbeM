@@ -33,7 +33,7 @@ BeginPackage["BProbe`"];
 	ProbeReset::usage = "";
 	ProbeGetGroundstateEnergy::usage = "";
 	ProbeGetEnergies::usage = "";
-	ProbeGetState::usage = "";
+	ProbeGetGroundstate::usage = "";
 	ProbeGetExpectedLocation::usage = "";
 	ProbeGetGroundstates::usage = "";
 	MatrixRepSU2::usage = "";
@@ -106,7 +106,7 @@ Begin["`Private`"];
 		Return[BProbe`Scan`getEigenvalues[p]];
 	] /; inited;
 	
-	ProbeGetState[p_?(VectorQ[#,NumericQ]&)] := Block[{},
+	ProbeGetGroundstate[p_?(VectorQ[#,NumericQ]&)] := Block[{},
 		Return[BProbe`Scan`getState[p]];
 	] /; inited;
 	
@@ -341,7 +341,7 @@ End[];
 	
 	ProbeGetEnergies::usage = BProbe`Private`header["ProbeGetEnergies", {{"List", "point"}}] <> " returns the energies of the (Laplace-/Dirac-) operator in question for a given point.";
 	
-	ProbeGetState::usage = BProbe`Private`header["ProbeGetState", {{"List", "point"}}] <> " returns the ground state of the (Laplace-/Dirac-) operator in question for a given point.";
+	ProbeGetGroundstate::usage = BProbe`Private`header["ProbeGetGroundstate", {{"List", "point"}}] <> " returns the ground state of the (Laplace-/Dirac-) operator in question for a given point.";
 	
 	ProbeGetGroundstates::usage = BProbe`Private`header["ProbeGetGroundstates", {}] <> " returns the ground states of the (Laplace-/Dirac-) operator for all points given by " <>  BProbe`Private`header["ProbeGetPointList", {}] <> "."
 	
