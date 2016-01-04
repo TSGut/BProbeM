@@ -65,7 +65,7 @@ Block[{t},
 (* set up *)
 ProbeInit[PauliMatrix[{1,2,3}],StartingPoint->{1,0,0}];
 
-VerificationTest[ProbeGetPointList[]
+VerificationTest[ProbeGetPoints[]
 	, {{1,0,0}}
-	, TestID -> "ProbeGetPointList-startingpoint"
+	, TestID -> "ProbeGetPoints-startingpoint"
 ]

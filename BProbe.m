@@ -29,7 +29,7 @@ BeginPackage["BProbe`"];
 (***************************************************************************************)
 	ProbeInit::usage = "";
 	ProbeScan::usage = "";
-	ProbeGetPointList::usage = "";
+	ProbeGetPoints::usage = "";
 	ProbeReset::usage = "";
 	ProbeGetGroundstateEnergy::usage = "";
 	ProbeGetEnergies::usage = "";
@@ -94,7 +94,7 @@ Begin["`Private`"];
 		
 	] /; inited;
 	
-	ProbeGetPointList[] := Block[{},
+	ProbeGetPoints[] := Block[{},
 		Return[BProbe`Scan`getList[]];
 	] /; inited;
 	
@@ -333,7 +333,7 @@ End[];
 	
 	ProbeScan::usage = BProbe`Private`header["ProbeScan", {{"Real", "step size"}}] <> " performs the actual scanning procedure. It implements an algorithm to rasterize the semi-classical limit of the brane configuration defined by a set of matrices as submanifold of the target space.";
 	
-	ProbeGetPointList::usage = BProbe`Private`header["ProbeGetPointList",{}] <> " returns a " <> BProbe`Private`doc["List"] <> " of already calculated points. A point is itself represented as a " <> BProbe`Private`doc["List"] <> " consisting of d " <> BProbe`Private`doc["Real"] <> "s.";
+	ProbeGetPoints::usage = BProbe`Private`header["ProbeGetPoints",{}] <> " returns a " <> BProbe`Private`doc["List"] <> " of already calculated points. A point is itself represented as a " <> BProbe`Private`doc["List"] <> " consisting of d " <> BProbe`Private`doc["Real"] <> "s.";
 	
 	ProbeReset::usage = BProbe`Private`header["ProbeReset",{}] <> " resets the package in a way, so that the command " <> BProbe`Private`header["ProbeScan", {{"Integer", "dimension"}, {"Real", "step size"}}] <> " starts a completely new calculation.";
 	
@@ -343,7 +343,7 @@ End[];
 	
 	ProbeGetGroundstate::usage = BProbe`Private`header["ProbeGetGroundstate", {{"List", "point"}}] <> " returns the ground state of the (Laplace-/Dirac-) operator in question for a given point.";
 	
-	ProbeGetGroundstates::usage = BProbe`Private`header["ProbeGetGroundstates", {}] <> " returns the ground states of the (Laplace-/Dirac-) operator for all points given by " <>  BProbe`Private`header["ProbeGetPointList", {}] <> "."
+	ProbeGetGroundstates::usage = BProbe`Private`header["ProbeGetGroundstates", {}] <> " returns the ground states of the (Laplace-/Dirac-) operator for all points given by " <>  BProbe`Private`header["ProbeGetPoints", {}] <> "."
 	
 	ProbeGetExpectedLocation::usage = BProbe`Private`header["ProbeGetExpectedLocation", {{"List", "point"}}] <> " returns the expectation value of the quantized embedding functions corresponding to the ground state of the (Laplace-/Dirac-) operator in question for a given point.\n" <>
 	BProbe`Private`header["ProbeGetExpectedLocation", {{"List", "state"}}] <> " returns the expectation value of the quantized embedding functions for the given state.";
