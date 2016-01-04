@@ -233,7 +233,8 @@ Begin["`Private`"];
 			{ "Absolute Hessian Eigenvalues at SP", MatrixForm[hevs] },
 			{ "Local brane dimension at SP", Style[TextString[info["BraneDimension"]],{Darker[If[info["BraneDimension"]==0,Red,Green]],Bold}] },
 			{ "Dimension of Target Space", Style[TextString[info["TargetSpaceDimension"]],Bold] },
-			{ "Dimension of Hilbert Space", Style[TextString[info["HilbertSpaceDimension"]],Bold] }
+			{ "Dimension of Hilbert Space", Style[TextString[info["HilbertSpaceDimension"]],Bold] },
+			{ "Step size guess", TextString[info["StepSize"]] }
 		};
 	
 		Return[Panel[TextGrid[
