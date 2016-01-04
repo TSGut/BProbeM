@@ -73,14 +73,12 @@ Begin["`Private`"];
 	] /; inited;
 
 	Options[ProbeScan] = Options[BProbe`Scan`start] ~Join~ {UpdateInterval->0.1};
-	ProbeScan[stepsize_?NumericQ /; stepsize > 0, opts:OptionsPattern[]] := Block[{},
+	ProbeScan[opts:OptionsPattern[]] := Block[{},
 
 		PrintTemporary["Scanning surface ... ",ProgressIndicator[Appearance -> "Necklace"]];
 		
 		Monitor[
-			BProbe`Scan`start[stepsize,
-				FilterRules[{opts}, Options[BProbe`Scan`start]]
-			];
+			BProbe`Scan`start[ FilterRules[{opts}, Options[BProbe`Scan`start]] ];
 		,
 			(* status message *)
 			Refresh[ generateStatus[FilterRules[{opts}, Options[BProbe`Scan`start]]], TrackedSymbols->{}, UpdateInterval -> OptionValue[UpdateInterval]]

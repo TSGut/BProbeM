@@ -194,6 +194,7 @@ Begin["`Private`"];
 	
 	Options[start] = {
 		Dimension -> branedim,
+		StepSize -> stepsizeguess,
 		MinimalSurface -> False,
 		GradientTracker -> False,
 		EnergyTracker -> False,
@@ -205,9 +206,9 @@ Begin["`Private`"];
 		Parallelize->True,
 		Profiling->False
 	}
-	start[ssize_, opts:OptionsPattern[]] := Block[{ppoint, cpoint},
+	start[opts:OptionsPattern[]] := Block[{ppoint, cpoint},
 
-		step = ssize;
+		step = OptionValue[StepSize];
 		startOptions = opts;
 
 		If[OptionValue[Parallelize],
