@@ -97,6 +97,16 @@ Begin["`Private`"];
 			];
 		)&, evlist];
 		
+		(* guess some step size (at least of the correct order) *)
+		Block[{evs, vol,volpp},
+			vol = Times @@ Map[(
+				evs = Re[Eigenvalues[#]]; (* Re: to be sure *)
+				(Max[evs]-Min[evs])
+			)&, N[t[[subspace]]]];
+			volpp = vol / 5000;
+			stepsizeguess = Power[volpp,1/Length[subspace]];
+		];
+		
 		reset[opts];
 		
 		info = <|
@@ -107,7 +117,8 @@ Begin["`Private`"];
 			"HEigenvaluesSP" -> evlist,
 			"BraneDimension" -> branedim,
 			"TargetSpaceDimension" -> Length[subspace],
-			"HilbertSpaceDimension" -> hdim
+			"HilbertSpaceDimension" -> hdim,
+			"StepSize" -> stepsizeguess
 		|>;
 		
 		Return[info];
