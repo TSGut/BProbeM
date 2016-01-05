@@ -103,7 +103,7 @@ Begin["`Private`"];
 				evs = Re[Eigenvalues[#]]; (* Re: to be sure *)
 				(Max[evs]-Min[evs])
 			)&, N[t[[subspace]]]];
-			volpp = vol / 5000;
+			volpp = vol / 3000;
 			stepsizeguess = Power[volpp,1/Length[subspace]];
 		];
 		
