@@ -213,7 +213,7 @@ Begin["`Private`"];
 
 		If[OptionValue[Parallelize],
 			Quiet[LaunchKernels[]];
-			DistributeDefinitions[getState, energyf, expvfunc, NHessian];
+			DistributeDefinitions[getState, energyf, expvfunc, NHessian, NGradient];
 			DistributeDefinitions[step];
 		];
 
@@ -235,9 +235,8 @@ Begin["`Private`"];
 				npoints = Thread[{Thread[npoints][[1]], manipulatePoints[ Thread[npoints][[2]] ]}];
 			];
 			
-			(* filter all points: qback, qenergy, qgradient *)
+			(* filter all points: qback, qenergy *)
 			(*---------------------------------------------*)
-			(* TODO: parallel processing for gradients, etc.. *)
 			npoints = Map[Block[{ppoint, cpoint, npoint},
 				npoint = #[[2]];
 				cpoint = pointlist[[boundary[[#[[1]]]][[2]]]];
@@ -249,6 +248,30 @@ Begin["`Private`"];
 					Nothing
 				]
 			]&,npoints] ~rec~ "Filtering";
+			
+			(* Gradient *)
+			(*---------------------------------------------*)
+			Block[{grads},
+			If[OptionValue[MaxGradient] < \[Infinity] || OptionValue[GradientTracker],
+				grads = If[OptionValue[Parallelize],
+					ParallelMap[ NGradient[ energyf, #[[2]] ]&, npoints ] ~rec~"ParallelGradient"
+				,
+					Map[ NGradient[energyf, #[[2]]]&, npoints ] ~rec~"Gradient"
+				];
+				
+				maxGradientTracker = Max[Max[Norm[#]& /@ grads], maxGradientTracker];
+			];
+			If[OptionValue[MaxGradient] < \[Infinity],
+				npoints = MapIndexed[(
+					If[Norm[grads[[First[#2]]]] < OptionValue[MaxGradient],
+						#1
+					,
+						rejectedCounterGrad += 1;
+						Nothing
+					]
+				)&, npoints];
+			];
+			];
 			
 			(* NNS - first check on existing points *)
 			(*---------------------------------------------*)
@@ -365,11 +388,7 @@ Begin["`Private`"];
 		
 		If[Not[QBack[ppoint, npoint]],
 			If[Not[QEnergyTooHigh[npoint]],
-				If[Not[QGradientTooHigh[npoint]],
-					Return[True];
-				,
-					rejectedCounterGrad += 1;
-				];
+				Return[True];
 			,
 				rejectedCounterVal += 1;
 			];
@@ -393,26 +412,8 @@ Begin["`Private`"];
 		];
 	
 	];
-
-
-	QGradientTooHigh[point_] := Block[{grad},
-			
-		(* perform check only if opts[MaxGradient] is finite *)
-		(* or opts[GradientTracker] is set *)
-		If[opts[MaxGradient] < \[Infinity] || opts[GradientTracker],
-			
-			grad = NGradient[energyf, point]	~rec~"Gradient";
-			
-			If[Norm[grad] > maxGradientTracker, maxGradientTracker=Norm[grad]];
-
-			Return[Norm[grad] > opts[MaxGradient]];
-		,
-			Return[False];
-		];
-
-	];
-
-
+	
+	
 	QEnergyTooHigh[point_] := Block[{val},
 			
 		(* perform check only if opts[MaxEnergy] is finite *)
