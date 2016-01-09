@@ -220,7 +220,8 @@ Begin["`Private`"];
 		(* CORE *)
 		While[Length[boundary] != 0, Block[{dirs, npoints, nearf},
 			
-			dirs = determineDirections[pointlist[[Thread[boundary][[2]]]]];
+			(* determine 'small' directions and double them (forward, backward) *)
+			dirs = Riffle[#, -#]& /@ determineDirections[pointlist[[Thread[boundary][[2]]]]];
 			
 			(* gather all potential new points *)
 			(*---------------------------------------------*)
@@ -336,9 +337,6 @@ Begin["`Private`"];
 				{}
 			]
 		)&, nhess])	~rec~ "Eigenvectors";
-		
-		(* double them (forward, backward) *)
-		directions = Map[Riffle[#, -#]&, directions];
 		
 		Return[directions];
 	];
