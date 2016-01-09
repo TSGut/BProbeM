@@ -298,6 +298,7 @@ Begin["`Private`"];
 					Norm[ grads[[i]] - Plus @@ (((grads[[i]].#)#)& /@ dirs[[i]]) ]
 				]&, grads];
 				
+				directions = dirs;
 				maxGradientTracker = Max[Max[projs], maxGradientTracker];
 			];
 			If[OptionValue[MaxGradient] < \[Infinity],
