@@ -422,9 +422,8 @@ Begin["`Private`"];
 		(* perform check only if evratio is finite *)
 		If[opts[MaxEV] < \[Infinity] || opts[EVTracker],
 			evs = Eigenvalues[nhess, -opts[Dimension]];
-			If[evs[[1]] > maxEVTracker, maxEVTracker = evs[[1]]];
-			
-			Return[evs[[1]] > opts[MaxEV]];
+			maxEVTracker = Max[Abs[evs[[1]]], maxEVTracker];
+			Return[Abs[evs[[1]]] > opts[MaxEV]];
 		,
 			Return[False];
 		];
