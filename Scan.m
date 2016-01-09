@@ -457,7 +457,11 @@ Begin["`Private`"];
 	SetAttributes[rec, HoldFirst];
 	rec[expr_,id_] := Block[{ret},
 		If[opts[Profiling],
-			ret = AddRecord[id, expr];
+			If[!ListQ[id],
+				ret = AddRecord[id, expr];
+			,
+				ret = AddRecord[id[[1]], expr, id[[2]]];
+			];
 		,
 			ret = expr;
 		];
