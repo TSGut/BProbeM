@@ -252,7 +252,7 @@ Begin["`Private`"];
 			
 			(* Gradient *)
 			(*---------------------------------------------*)
-			Block[{grads},
+			Block[{grads, dirs, projs},
 			If[OptionValue[MaxGradient] < \[Infinity] || OptionValue[GradientTracker],
 				grads = If[OptionValue[Parallelize],
 					ParallelMap[ NGradient[ energyf, #[[2]] ]&, npoints ] ~rec~"ParallelGradient"
@@ -260,11 +260,17 @@ Begin["`Private`"];
 					Map[ NGradient[energyf, #[[2]]]&, npoints ] ~rec~"Gradient"
 				];
 				
-				maxGradientTracker = Max[Max[Norm[#]& /@ grads], maxGradientTracker];
+				dirs = determineDirections[ Thread[npoints][[2]] ] ~rec~"GradientDirsTemp";
+				projs = MapIndexed[Block[{i},
+					i = First[#2];
+					Norm[ grads[[i]] - Plus @@ (((grads[[i]].#)#)& /@ dirs[[i]]) ]
+				]&, grads];
+				
+				maxGradientTracker = Max[Max[projs], maxGradientTracker];
 			];
 			If[OptionValue[MaxGradient] < \[Infinity],
 				npoints = MapIndexed[(
-					If[Norm[grads[[First[#2]]]] < OptionValue[MaxGradient],
+					If[projs[[First[#2]]] < OptionValue[MaxGradient],
 						#1
 					,
 						rejectedCounterGrad += 1;
