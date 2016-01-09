@@ -36,19 +36,24 @@ Begin["`Private`"];
 	profiles = <||>;
 
 	SetAttributes[AddRecord, HoldRest];
-	AddRecord[id_, expr_] := Block[{timing},
+	AddRecord[id_, expr_, n_:1] := Block[{timing},
 	
-		(* create id if doesnt exist *)
-		If[!VectorQ[profiles[id]],
-			AppendTo[profiles, id -> {}];
+		If[n!=0,
+			(* create id if doesnt exist *)
+			If[!VectorQ[profiles[id]],
+				AppendTo[profiles, id -> {}];
+			];
+			
+			timing = AbsoluteTiming[expr];
+			profiles[id] = profiles[id] ~Join~ Table[timing[[1]]/n,{n}];
+			
+			Return[timing[[2]]];
+		,
+			Return[expr];
 		];
-		
-		timing = AbsoluteTiming[expr];
-		AppendTo[profiles[id],timing[[1]]];
-		
-		Return[timing[[2]]];
 	
 	];
+
 	
 	ShowProfileChart[] := Block[{bc},
 		bc = BarChart[
