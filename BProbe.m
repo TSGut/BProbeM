@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (*
-	Copyright 2015 Lukas Schneiderbauer (lukas.schneiderbauer@gmail.com)
+    Copyright 2015 Lukas Schneiderbauer (lukas.schneiderbauer@gmail.com)
 
 
     This file is part of BProbe.
@@ -49,7 +49,7 @@ Begin["`Private`"];
 	Get[ "BProbe`SU3Gen`" ];
 	Get[ "BProbe`PHelper`" ];
 	
-
+	
 	Options[ProbeInit] = Options[BProbe`Scan`init];
 	ProbeInit[] := Block[{}, inited=False; ];
 	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{info},
@@ -59,7 +59,7 @@ Begin["`Private`"];
 		dimTargetSpace = info["TargetSpaceDimension"];
 		dimBrane = info["BraneDimension"];
 		dimHilbert = info["HilbertSpaceDimension"];
-
+		
 		inited=True; (* say: okay, we did a initialization *)
 		
 		Print[styleInitInfo[info]];
@@ -74,7 +74,7 @@ Begin["`Private`"];
 
 	Options[ProbeScan] = Options[BProbe`Scan`start] ~Join~ {UpdateInterval->0.1};
 	ProbeScan[opts:OptionsPattern[]] := Block[{},
-
+		
 		PrintTemporary["Scanning surface ... ",ProgressIndicator[Appearance -> "Necklace"]];
 		
 		Monitor[
@@ -83,7 +83,7 @@ Begin["`Private`"];
 			(* status message *)
 			Refresh[ generateStatus[FilterRules[{opts}, Options[BProbe`Scan`start]]], TrackedSymbols->{}, UpdateInterval -> OptionValue[UpdateInterval]]
 		];
-
+		
 		(* print it out again, so it doesnt just vanish when finished *)
 		Print[generateStatus[FilterRules[{opts}, Options[BProbe`Scan`start]]]];
 		
@@ -173,21 +173,21 @@ Begin["`Private`"];
 			reports = TestReport[#]& /@ filenames;
 		
 		]; (* Print and PrintTemporary are usable again at this point *)
-
+		
 		
 		Do[
 			testcount += Length[reports[[i]]["TestResults"]];
-		
+			
 			If[reports[[i]]["AllTestsSucceeded"]==False,
 				allsucceeded=False;
-		
+				
 				report = {
 					{ "Tests failed", Style[reports[[i]]["TestsFailedCount"],{Bold,Red}] },
 					{ "Tests succeeded", Style[reports[[i]]["TestsSucceededCount"],{Bold,Darker[Green]}] },
 					{ "Time elapsed", reports[[i]]["TimeElapsed"] },
 					{ "Failed tests", Union[Values[reports[[i]]["TestsFailed"]]] }
 				};
-			
+				
 				Print[Panel[TextGrid[
 					report,
 					Dividers -> Center,
@@ -210,11 +210,11 @@ Begin["`Private`"];
 	(* Mathematica seems to have the weirdest directory-handling I've ever seen, *)
 	(* so I need this ugly workaround *)
 	thisDirectory[] = DirectoryName[$InputFileName];
-
+	
 	styleInitInfo[info_] := Block[{textgrid, hevs},
 		
 		hevs = info["HEigenvaluesSP"];
-
+		
 		Do[
 			hevs[[i]] = If[i <= info["BraneDimension"],
 				Style[TextString[hevs[[i]]], Darker[Green]]
@@ -222,7 +222,7 @@ Begin["`Private`"];
 				Style[TextString[hevs[[i]]], Darker[Red]]
 			];
 		, {i, Length[hevs]}];
-	
+		
 		textgrid = {
 			{ "Energy Probe", Style[info["EnergyProbe"], Bold] },
 			{ "Starting Point (SP)", MatrixForm[info["StartingPoint"]] },
@@ -234,7 +234,7 @@ Begin["`Private`"];
 			{ "Dimension of Hilbert Space", Style[TextString[info["HilbertSpaceDimension"]],Bold] },
 			{ "Step size guess", TextString[info["StepSize"]] }
 		};
-	
+		
 		Return[Panel[TextGrid[
 			textgrid,
 			Dividers -> Center,
@@ -247,7 +247,7 @@ Begin["`Private`"];
 	(* status message: accesses private variables of `Scan` *)
 	generateStatus[options:OptionsPattern[]] := Block[{status, points, tracker, rejections},
 		opts[symbol_] := OptionValue[BProbe`Scan`start, options, symbol];
-	
+		
 		points = {
 			{ "Number of total points gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },
 			{ "Number of points currently processing" , Length[BProbe`Scan`Private`boundary] }
@@ -280,7 +280,7 @@ Begin["`Private`"];
 				Sow[{ "Rejected points due to 'MaxGradient'" , Style[TextString[BProbe`Scan`Private`rejectedCounterGrad], Darker[Red]] }];
 			];
 		][[2]],1];
-
+		
 		status = Flatten[Reap[
 			Sow[{ getPanel["Status Information", points] }];
 			If[Length[tracker] > 0, Sow[{ getPanel["Tracker", tracker] }]];
@@ -299,8 +299,8 @@ Begin["`Private`"];
 			ItemSize -> {{Automatic, Fit}}
 		], title, ImageSize->Full];
 	
-
-    (* formatting stuff for usage messages	*)
+	
+	(* formatting stuff for usage messages	*)
 	(****************************************)
 	
 	link[name_] := ToString[Hyperlink[name, "file://" <> FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe", "Documentation", name <> ".html"}]], StandardForm];
