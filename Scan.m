@@ -75,7 +75,7 @@ Begin["`Private`"];
 		(* automatically determine starting point, if not given *)
 		If[!ListQ[OptionValue[StartingPoint]],
 			Block[{f2,p,s},
-				PrintTemporary["* Look for global minimum of energy displacement ..."];
+				PrintTemporary["* Look for global minimum of displacement energy ..."];
 				p = Table[Unique["p"], {Length[t]}];
 				p[[Complement[Range[Length[t]],subspace]]] = 0;
 				p = DeleteCases[p,0];
