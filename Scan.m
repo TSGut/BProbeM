@@ -255,7 +255,7 @@ Begin["`Private`"];
 				,
 					Nothing
 				]
-			]&,npoints] ~rec~ "Filtering";
+			]&,npoints] ~rec~ {"Filtering", Length[npoints]};
 			
 			
 			(* NNS - first check on existing points *)
@@ -268,7 +268,7 @@ Begin["`Private`"];
 				,
 					Nothing
 				]
-			]&, npoints] ~rec~ "NNS-1";
+			]&, npoints] ~rec~ {"NNS-1", Length[npoints]};
 			
 			(* NNS - second check on new points *)
 			(*---------------------------------------------*)
@@ -278,8 +278,8 @@ Begin["`Private`"];
 					If[Length[npoints]==0 || Length[Nearest[Thread[npoints][[2]], #[[2]] ,{1,step*0.3}]] == 0,
 						AppendTo[npoints, #];
 					];
-				)&, nnpoints];
-			] ~rec~ "NNS-2";
+				)&, nnpoints] ~rec~ {"NNS-2", Length[nnpoints]};
+			];
 			
 			
 			(* Gradient *)
@@ -287,9 +287,9 @@ Begin["`Private`"];
 			Block[{grads, dirs, projs, nrange},
 			If[OptionValue[MaxGradient] < \[Infinity] || OptionValue[GradientTracker],
 				grads = If[OptionValue[Parallelize],
-					ParallelMap[ NGradient[ energyf, #[[2]] ]&, npoints ] ~rec~"ParallelGradient"
+					ParallelMap[ NGradient[ energyf, #[[2]] ]&, npoints ] ~rec~{"ParallelGradient",Length[npoints]}
 				,
-					Map[ NGradient[energyf, #[[2]]]&, npoints ] ~rec~"Gradient"
+					Map[ NGradient[energyf, #[[2]]] &, npoints ] ~rec~{"Gradient",Length[npoints]}
 				];
 				
 				dirs = determineDirections[ If[Length[npoints]==0, {}, Transpose[npoints][[2]]] ];
@@ -340,11 +340,11 @@ Begin["`Private`"];
 		If[opts[Parallelize],
 			(nhess = ParallelMap[(
 				NHessian[energyf, #, Scale -> step/10]
-			)&, points]) ~rec~ "HessianParallel" ;
+			)&, points]) ~rec~ {"HessianParallel",Length[points]} ;
 		,
 			(nhess = Map[(
 				NHessian[energyf, #, Scale -> step/10]
-			)&, points]) ~rec~ "Hessian" ;
+			)&, points]) ~rec~ {"Hessian",Length[points]} ;
 		];
 		
 		(* directions from Hessian *)
@@ -377,12 +377,12 @@ Begin["`Private`"];
 				manpoints = ParallelMap[Block[{s},
 					(Quiet[s = FindMinimum[f2 @@ p, Thread[{p,#}]]]);
 					(p /. s[[2]])
-				]&, npoints] ~rec~ "FindMinimumParallel";
+				]&, npoints] ~rec~ {"FindMinimumParallel",Length[npoints]};
 			,
 				manpoints = Map[(
 					(Quiet[s = FindMinimum[f2 @@ p, Thread[{p,#}]]]);
 					(p /. s[[2]])
-				)&, npoints] ~rec~ "FindMinimum";
+				)&, npoints] ~rec~ {"FindMinimum",Length[npoints]};
 			];
 		];
 		
@@ -390,9 +390,9 @@ Begin["`Private`"];
 		(* replace points by their corresponding expectation values *)
 		If[opts[ReplacePoints],
 			If[opts[Parallelize],
-				(manpoints = ParallelMap[expvfunc[#]&, npoints])	~rec~ "ReplacePointsParallel";
+				(manpoints = ParallelMap[expvfunc[#]&, npoints])	~rec~ {"ReplacePointsParallel",Length[npoints]};
 			,
-				(manpoints = expvfunc[#]& /@ npoints)	~rec~"ReplacePoints";
+				(manpoints = expvfunc[#]& /@ npoints) ~rec~ {"ReplacePoints",Length[npoints]};
 			];
 		];
 		
@@ -436,7 +436,7 @@ Begin["`Private`"];
 		(* perform check only if opts[MaxEnergy] is finite *)
 		If[opts[MaxEnergy] < \[Infinity] || opts[EnergyTracker],
 			
-			val = Abs[energyf[point]]		~rec~"FuncEval";
+			val = Abs[energyf[point]] ~rec~"ExtraFuncEval";
 			
 			If[val > maxEnergyTracker, maxEnergyTracker = val];
 			
