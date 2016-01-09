@@ -291,7 +291,7 @@ Begin["`Private`"];
 				npoints = {};
 				Scan[(
 					If[Length[npoints]==0 || Length[Nearest[Thread[npoints][[2]], #[[2]] ,{1,step*0.3}]] == 0,
-						AppendTo[npoints, { #[[1]], #[[2]] }];
+						AppendTo[npoints, #];
 					];
 				)&, nnpoints];
 			] ~rec~ "NNS-2";
