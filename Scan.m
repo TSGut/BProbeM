@@ -250,35 +250,6 @@ Begin["`Private`"];
 				]
 			]&,npoints] ~rec~ "Filtering";
 			
-			(* Gradient *)
-			(*---------------------------------------------*)
-			Block[{grads, dirs, projs},
-			If[OptionValue[MaxGradient] < \[Infinity] || OptionValue[GradientTracker],
-				grads = If[OptionValue[Parallelize],
-					ParallelMap[ NGradient[ energyf, #[[2]] ]&, npoints ] ~rec~"ParallelGradient"
-				,
-					Map[ NGradient[energyf, #[[2]]]&, npoints ] ~rec~"Gradient"
-				];
-				
-				dirs = determineDirections[ Thread[npoints][[2]] ] ~rec~"GradientDirsTemp";
-				projs = MapIndexed[Block[{i},
-					i = First[#2];
-					Norm[ grads[[i]] - Plus @@ (((grads[[i]].#)#)& /@ dirs[[i]]) ]
-				]&, grads];
-				
-				maxGradientTracker = Max[Max[projs], maxGradientTracker];
-			];
-			If[OptionValue[MaxGradient] < \[Infinity],
-				npoints = MapIndexed[(
-					If[projs[[First[#2]]] < OptionValue[MaxGradient],
-						#1
-					,
-						rejectedCounterGrad += 1;
-						Nothing
-					]
-				)&, npoints];
-			];
-			];
 			
 			(* NNS - first check on existing points *)
 			(*---------------------------------------------*)
@@ -302,6 +273,38 @@ Begin["`Private`"];
 					];
 				)&, nnpoints];
 			] ~rec~ "NNS-2";
+			
+			
+			(* Gradient *)
+			(*---------------------------------------------*)
+			Block[{grads, dirs, projs},
+			If[OptionValue[MaxGradient] < \[Infinity] || OptionValue[GradientTracker],
+				grads = If[OptionValue[Parallelize],
+					ParallelMap[ NGradient[ energyf, #[[2]] ]&, npoints ] ~rec~"ParallelGradient"
+				,
+					Map[ NGradient[energyf, #[[2]]]&, npoints ] ~rec~"Gradient"
+				];
+				
+				dirs = determineDirections[ If[Length[npoints]==0, {}, Transpose[npoints][[2]]] ] ~rec~"GradientDirsTemp";
+				projs = MapIndexed[Block[{i},
+					i = First[#2];
+					Norm[ grads[[i]] - Plus @@ (((grads[[i]].#)#)& /@ dirs[[i]]) ]
+				]&, grads];
+				
+				maxGradientTracker = Max[Max[projs], maxGradientTracker];
+			];
+			If[OptionValue[MaxGradient] < \[Infinity],
+				npoints = MapIndexed[(
+					If[projs[[First[#2]]] < OptionValue[MaxGradient],
+						#1
+					,
+						rejectedCounterGrad += 1;
+						Nothing
+					]
+				)&, npoints];
+			];
+			];
+			
 			
 			(* shovel all new points into boundary *)
 			(*---------------------------------------------*)
