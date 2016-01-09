@@ -193,8 +193,8 @@ Begin["`Private`"];
 
 	
 	Options[start] = {
-		Dimension -> branedim,
-		StepSize -> stepsizeguess,
+		Dimension :> branedim,
+		StepSize :> stepsizeguess,
 		MinimalSurface -> False,
 		GradientTracker -> False,
 		EnergyTracker -> False,
