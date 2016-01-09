@@ -154,7 +154,7 @@ Begin["`Private`"];
 	
 	(* runs all Tests specified in ./Tests/ *)
 	(****************************************)
-	RunTests[] := Block[{testdir, filenames, reports, report, allsucceeded, testcount, output, ptemp},
+	RunTests[] := Block[{testdir, filenames, reports, report, allsucceeded, testcount},
 		
 		testcount = 0;
 		allsucceeded=True;
