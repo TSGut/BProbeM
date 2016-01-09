@@ -206,7 +206,7 @@ Begin["`Private`"];
 		Parallelize->True,
 		Profiling->False
 	}
-	start[opts:OptionsPattern[]] := Block[{ppoint, cpoint},
+	start[opts:OptionsPattern[]] := Block[{ppoint, cpoint, directions},
 
 		step = OptionValue[StepSize];
 		startOptions = opts;
@@ -216,12 +216,19 @@ Begin["`Private`"];
 			DistributeDefinitions[getState, energyf, expvfunc, NHessian, NGradient];
 			DistributeDefinitions[step];
 		];
-
+		
+		directions = {}; (* this will be a cache for pre-calculated directions (MaxGradient) *)
+		
 		(* CORE *)
 		While[Length[boundary] != 0, Block[{dirs, npoints, nearf},
 			
-			(* determine 'small' directions and double them (forward, backward) *)
-			dirs = Riffle[#, -#]& /@ determineDirections[pointlist[[Thread[boundary][[2]]]]];
+			(* look whether already calculated; this would be the case if MaxGradient is set *)
+			If[Length[directions] == Length[boundary],
+				dirs = Riffle[#, -#]& /@ directions;
+			,
+				(* determine 'small' directions and double them (forward, backward) *)
+				dirs = Riffle[#, -#]& /@ determineDirections[pointlist[[Thread[boundary][[2]]]]];
+			];
 			
 			(* gather all potential new points *)
 			(*---------------------------------------------*)
@@ -277,7 +284,7 @@ Begin["`Private`"];
 			
 			(* Gradient *)
 			(*---------------------------------------------*)
-			Block[{grads, dirs, projs},
+			Block[{grads, dirs, projs, nrange},
 			If[OptionValue[MaxGradient] < \[Infinity] || OptionValue[GradientTracker],
 				grads = If[OptionValue[Parallelize],
 					ParallelMap[ NGradient[ energyf, #[[2]] ]&, npoints ] ~rec~"ParallelGradient"
@@ -285,7 +292,7 @@ Begin["`Private`"];
 					Map[ NGradient[energyf, #[[2]]]&, npoints ] ~rec~"Gradient"
 				];
 				
-				dirs = determineDirections[ If[Length[npoints]==0, {}, Transpose[npoints][[2]]] ] ~rec~"GradientDirsTemp";
+				dirs = determineDirections[ If[Length[npoints]==0, {}, Transpose[npoints][[2]]] ];
 				projs = MapIndexed[Block[{i},
 					i = First[#2];
 					Norm[ grads[[i]] - Plus @@ (((grads[[i]].#)#)& /@ dirs[[i]]) ]
@@ -294,14 +301,17 @@ Begin["`Private`"];
 				maxGradientTracker = Max[Max[projs], maxGradientTracker];
 			];
 			If[OptionValue[MaxGradient] < \[Infinity],
-				npoints = MapIndexed[(
-					If[projs[[First[#2]]] < OptionValue[MaxGradient],
-						#1
+				nrange = Map[(
+					If[projs[[#]] < OptionValue[MaxGradient],
+						#
 					,
 						rejectedCounterGrad += 1;
 						Nothing
 					]
-				)&, npoints];
+				)&, Range[1,Length[npoints]]];
+				
+				npoints = npoints[[nrange]];
+				directions = dirs[[nrange]];
 			];
 			];
 			
