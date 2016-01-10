@@ -237,13 +237,13 @@ Begin["`Private`"];
 				Sow[{ i, (cpoint + #*step) }]& /@ dirs[[i]]
 			], {i, Length[dirs]}]][[2]],1] ~rec~ "Gathering new points";
 			
-			(* manipulate new points *)
+			(* manipulate new points: ReplacePoints, MinimalSurface *)
 			(*---------------------------------------------*)
 			If[Length[npoints]>0,
 				npoints = Thread[{Thread[npoints][[1]], manipulatePoints[ Thread[npoints][[2]] ]}];
 			];
 			
-			(* filter all points: qback, qenergy *)
+			(* filter points: qback, qenergy *)
 			(*---------------------------------------------*)
 			npoints = Map[Block[{ppoint, cpoint, npoint},
 				npoint = #[[2]];
