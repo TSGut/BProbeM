@@ -42,11 +42,11 @@ BeginPackage["BProbe`Scan`"];
 Begin["`Private`"];
 
 	Options[init] = {
-		StartingPoint -> "min",
 		Probe -> "Laplace",
-		Subspace -> Full
-	};
-	init[t_, opts:OptionsPattern[]] := Block[{info, evlist, subspace, obs, gdim, hdim},
+		Subspace -> Full,
+		StartingPoint -> "GlobalMinimum"
+	}
+	init[t_, opts:OptionsPattern[]] := Block[{stepsizeguess, subspace, obs, gdim, hdim},
 		
 		If[Not[ListQ[OptionValue[Subspace]]],
 			(* in this case, take the full space *)
@@ -81,21 +81,9 @@ Begin["`Private`"];
 				p = DeleteCases[p,0];
 				f2[p__?NumericQ] := energyf[{p}];
 				s = NMinimize[f2 @@ p,p];
-				startPoint = p /. s[[2]];
+				gMinEnergyPoint = p /. s[[2]];
 			];
-		,
-			startPoint = OptionValue[StartingPoint];
 		];
-		
-		(* automatically determine local dimension of brane *)
-		(* i.e. just check for eigenvalues < some small value *)
-		branedim = 0;
-		evlist = Sort[Abs[#]&/@ Eigenvalues[NHessian[energyf,startPoint, Scale -> 0.01]]];
-		Scan[(
-			If[# < 0.3,
-				branedim += 1;
-			];
-		)&, evlist];
 		
 		(* guess some step size (at least of the correct order) *)
 		Block[{evs, vol,volpp},
@@ -107,21 +95,17 @@ Begin["`Private`"];
 			stepsizeguess = Power[volpp,1/Length[subspace]];
 		];
 		
-		reset[opts];
+		Info = <||>;
 		
-		info = <|
-			"EnergyProbe" -> OptionValue[Probe],
-			"StartingPoint" -> startPoint,
-			"EnergySP" -> energyf[startPoint],
-			"GradientSP" -> Norm[NGradient[energyf,startPoint]],
-			"HEigenvaluesSP" -> evlist,
-			"BraneDimension" -> branedim,
-			"TargetSpaceDimension" -> Length[subspace],
-			"HilbertSpaceDimension" -> hdim,
-			"StepSize" -> stepsizeguess
-		|>;
+		(* reset needs initalized Info and gMinEnergyPoint set *)
+		reset[StartingPoint -> OptionValue[StartingPoint]];
 		
-		Return[info];
+		Info["EnergyProbe"] = OptionValue[Probe];
+		Info["TargetSpaceDimension"] = Length[subspace];
+		Info["HilbertSpaceDimension"] = hdim;
+		Info["StepSize"] = stepsizeguess;
+		
+		Return[Info];
 	];
 
 
@@ -162,16 +146,28 @@ Begin["`Private`"];
 		Return[cexp];
 	];
 
-	Options[reset] = Options[init];
-	reset[OptionsPattern[]] := Block[{},
+	Options[reset] = { StartingPoint :> Info["StartingPoint"] };
+	reset[OptionsPattern[]] := Block[{branedim, evlist},
 		
-		If[ListQ[OptionValue[StartingPoint]],
-			startPoint = OptionValue[StartingPoint];
-		]; 
-	
+		Info["StartingPoint"] = (OptionValue[StartingPoint] /. "GlobalMinimum" -> gMinEnergyPoint);
+		
+		Info["EnergySP"] = energyf[Info["StartingPoint"]];
+		Info["GradientSP"] = Norm[NGradient[energyf,Info["StartingPoint"]]];
+		
+		
+		(* automatically determine local dimension of brane *)
+		(* i.e. just check for eigenvalues < some small value *)
+		branedim = 0;
+		evlist = Sort[Abs[#]&/@ Eigenvalues[NHessian[energyf,Info["StartingPoint"], Scale -> 0.01]]];
+		Scan[If[# < 0.3, branedim += 1;	]&, evlist];
+		
+		Info["HEigenvaluesSP"] = evlist;
+		Info["BraneDimension"] = branedim;
+		
+		
 		(* init stuff *)
 		ResetProfile[];
-		pointlist = {startPoint};
+		pointlist = {Info["StartingPoint"]};
 		
 		boundary = {{1,1}};
 	
@@ -182,6 +178,7 @@ Begin["`Private`"];
 		maxEVTracker = 0;
 		maxGradientTracker = 0;
 		
+		Return[Info];
 	];
 	
 	
@@ -193,8 +190,8 @@ Begin["`Private`"];
 
 	
 	Options[start] = {
-		Dimension :> branedim,
-		StepSize :> stepsizeguess,
+		Dimension :> Info["BraneDimension"],
+		StepSize :> Info["StepSize"],
 		MinimalSurface -> False,
 		GradientTracker -> False,
 		EnergyTracker -> False,
