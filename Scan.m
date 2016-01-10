@@ -250,8 +250,13 @@ Begin["`Private`"];
 				cpoint = pointlist[[boundary[[#[[1]]]][[2]]]];
 				ppoint = pointlist[[boundary[[#[[1]]]][[1]]]];
 				
-				If[QValidPoint[ppoint, npoint],
-					{ #[[1]] , npoint }
+				If[Not[QBack[ppoint, npoint]],
+					If[Not[QEnergyTooHigh[npoint]],
+						{ #[[1]] , npoint }
+					,
+						rejectedCounterVal += 1;
+						Nothing
+					]
 				,
 					Nothing
 				]
@@ -399,21 +404,6 @@ Begin["`Private`"];
 		
 		Return[manpoints];
 		
-	];
-
-
-	QValidPoint[ppoint_,npoint_] := Block[{},
-		
-		If[Not[QBack[ppoint, npoint]],
-			If[Not[QEnergyTooHigh[npoint]],
-				Return[True];
-			,
-				rejectedCounterVal += 1;
-			];
-		];
-
-		(*otherwise*)
-		Return[False];
 	];
 
 
