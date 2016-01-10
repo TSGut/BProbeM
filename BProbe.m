@@ -261,7 +261,7 @@ Begin["`Private`"];
 			];
 			
 			If[opts[EnergyTracker] || (opts[MaxEnergy] < \[Infinity]),
-				Sow[{ "Largest emerged Displacement Energy" , TextString[BProbe`Scan`Private`maxEnergyTracker] }];
+				Sow[{ "Smallest/Largest emerged Displacement Energy" , Last[FoldList[(TextString[#1]  <> " / " <> TextString[#2]) &, BProbe`Scan`Private`intEnergyTracker]] }];
 			];
 			
 			If[opts[EVTracker] || (opts[MaxEV] < \[Infinity]),

@@ -174,7 +174,7 @@ Begin["`Private`"];
 		rejectedCounterGrad = 0;
 		rejectedCounterVal = 0;
 		rejectedCounterRat = 0;
-		maxEnergyTracker = 0;
+		intEnergyTracker = { Info["EnergySP"], Info["EnergySP"] };
 		maxEVTracker = 0;
 		maxGradientTracker = 0;
 		
@@ -421,7 +421,7 @@ Begin["`Private`"];
 		(* perform check only if opts[MaxEnergy] is finite *)
 		If[opts[MaxEnergy] < \[Infinity] || opts[EnergyTracker],
 			val = Abs[energyf[point]] ~rec~"ExtraFuncEval";
-			maxEnergyTracker = Max[val, maxEnergyTracker];
+			intEnergyTracker = {Min[val, intEnergyTracker[[1]]], Max[val, intEnergyTracker[[2]]]};
 			Return[val > opts[MaxEnergy]];
 		,
 			Return[False];
