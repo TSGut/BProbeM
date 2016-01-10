@@ -52,23 +52,25 @@ Begin["`Private`"];
 	
 	Options[ProbeInit] = Options[BProbe`Scan`init];
 	ProbeInit[] := Block[{}, inited=False; ];
-	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{info},
+	ProbeInit[t_?(VectorQ[#,MatrixQ]&), opts:OptionsPattern[]] := Block[{},
 		
-		info = BProbe`Scan`init[t, FilterRules[{opts}, Options[BProbe`Scan`init]]];
-		
-		dimTargetSpace = info["TargetSpaceDimension"];
-		dimBrane = info["BraneDimension"];
-		dimHilbert = info["HilbertSpaceDimension"];
-		
+		Info = BProbe`Scan`init[t, FilterRules[{opts}, Options[BProbe`Scan`init]]];
 		inited=True; (* say: okay, we did a initialization *)
 		
-		Print[styleInitInfo[info]];
+		Print[styleInitInfo[Info]];
 	];
 	
 	Options[ProbeReset] = Options[BProbe`Scan`reset];
-	ProbeReset[opts:OptionsPattern[]] := Block[{},
+	ProbeReset[opts:OptionsPattern[]] := Block[{info},
 		
-		BProbe`Scan`reset[opts];
+		info = BProbe`Scan`reset[opts];
+		
+		(* print new status info only if StartingPoint has changed *)
+		If[info["StartingPoint"] != Info["StartingPoint"],
+			Print[styleInitInfo[info]];
+		];
+		
+		Info = info;
 		
 	] /; inited;
 
@@ -126,13 +128,13 @@ Begin["`Private`"];
 	] /; inited;
 	
 	ProbeGetExpectedLocation[state_?(VectorQ[#,NumericQ]&) /;
-		Length[state]==dimHilbert
+		Length[state]==Info["HilbertSpaceDimension"]
 	] := Block[{},
 		Return[BProbe`Scan`getExpectedLocation[state]];
 	] /; inited;
 	
 	ProbeGetExpectedLocation[p_?(VectorQ[#,NumericQ]&) /;
-		Length[p]==dimTargetSpace
+		Length[p]==Info["TargetSpaceDimension"]
 	] := Block[{},
 		Return[BProbe`Scan`getExpectedLocation[BProbe`Scan`getState[p]]];
 	] /; inited;
