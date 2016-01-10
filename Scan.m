@@ -301,21 +301,21 @@ Begin["`Private`"];
 				
 				directions = dirs;
 				maxGradientTracker = Max[Max[projs], maxGradientTracker];
-			];
-			If[OptionValue[MaxGradient] < \[Infinity],
-				nrange = Map[(
-					If[projs[[#]] < OptionValue[MaxGradient],
-						#
-					,
-						rejectedCounterGrad += 1;
-						Nothing
-					]
-				)&, Range[1,Length[npoints]]];
 				
-				npoints = npoints[[nrange]];
-				directions = dirs[[nrange]];
-			];
-			];
+				If[OptionValue[MaxGradient] < \[Infinity],
+					nrange = Map[(
+						If[projs[[#]] < OptionValue[MaxGradient],
+							#
+						,
+							rejectedCounterGrad += 1;
+							Nothing
+						]
+					)&, Range[1,Length[npoints]]];
+					
+					npoints = npoints[[nrange]];
+					directions = dirs[[nrange]];
+				];
+			]];
 			
 			
 			(* shovel all new points into boundary *)
