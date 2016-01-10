@@ -206,7 +206,7 @@ Begin["`Private`"];
 		Parallelize->True,
 		Profiling->False
 	}
-	start[opts:OptionsPattern[]] := Block[{ppoint, cpoint, directions},
+	start[opts:OptionsPattern[]] := Block[{directions},
 
 		step = OptionValue[StepSize];
 		startOptions = opts;
@@ -247,7 +247,6 @@ Begin["`Private`"];
 			(*---------------------------------------------*)
 			npoints = Map[Block[{ppoint, cpoint, npoint},
 				npoint = #[[2]];
-				cpoint = pointlist[[boundary[[#[[1]]]][[2]]]];
 				ppoint = pointlist[[boundary[[#[[1]]]][[1]]]];
 				
 				If[Not[QBack[ppoint, npoint]],
