@@ -430,23 +430,18 @@ Begin["`Private`"];
 	
 	];
 	
-	
 	QEnergyTooHigh[point_] := Block[{val},
 			
 		(* perform check only if opts[MaxEnergy] is finite *)
 		If[opts[MaxEnergy] < \[Infinity] || opts[EnergyTracker],
-			
 			val = Abs[energyf[point]] ~rec~"ExtraFuncEval";
-			
-			If[val > maxEnergyTracker, maxEnergyTracker = val];
-			
+			maxEnergyTracker = Max[val, maxEnergyTracker];
 			Return[val > opts[MaxEnergy]];
 		,
 			Return[False];
 		];
 	];
-
-
+	
 	(* Are we going back again? *)
 	QBack[ppoint_,npoint_]:= (* [pastpoint, newpoint] *)
 		Norm[npoint-ppoint] < step*0.7;		(* TODO: check if this makes sense in all poss. configs *)
