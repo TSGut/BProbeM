@@ -72,17 +72,15 @@ Begin["`Private`"];
 		energyf[y_] := Abs[Eigenvalues[cop @@ N[y], -1][[1]]];
 		expvfunc[y_] := Re[cexp @@ getState[N[y]]];
 		
-		(* automatically determine starting point, if not given *)
-		If[!ListQ[OptionValue[StartingPoint]],
-			Block[{f2,p,s},
-				PrintTemporary["* Look for global minimum of displacement energy ..."];
-				p = Table[Unique["p"], {Length[t]}];
-				p[[Complement[Range[Length[t]],subspace]]] = 0;
-				p = DeleteCases[p,0];
-				f2[p__?NumericQ] := energyf[{p}];
-				s = NMinimize[f2 @@ p,p];
-				gMinEnergyPoint = p /. s[[2]];
-			];
+		(* find global minimum *)
+		Block[{f2,p,s},
+			PrintTemporary["* Look for global minimum of displacement energy ..."];
+			p = Table[Unique["p"], {Length[t]}];
+			p[[Complement[Range[Length[t]],subspace]]] = 0;
+			p = DeleteCases[p,0];
+			f2[p__?NumericQ] := energyf[{p}];
+			s = NMinimize[f2 @@ p,p];
+			gMinEnergyPoint = p /. s[[2]];
 		];
 		
 		(* guess some step size (at least of the correct order) *)
@@ -174,7 +172,7 @@ Begin["`Private`"];
 		rejectedCounterGrad = 0;
 		rejectedCounterVal = 0;
 		rejectedCounterRat = 0;
-		rejectedCounterNss = 0;
+		rejectedCounterNNS = 0;
 		intEnergyTracker = { Info["EnergySP"], Info["EnergySP"] };
 		maxEVTracker = 0;
 		maxGradientTracker = 0;
@@ -268,7 +266,7 @@ Begin["`Private`"];
 				If[Length[nearf[npoint,{1,step*0.3}]] == 0,
 					{ #[[1]] , npoint }
 				,
-					rejectedCounterNss += 1;
+					rejectedCounterNNS += 1;
 					Nothing
 				]
 			]&, npoints] ~rec~ {"NNS-1", Length[npoints]};
@@ -281,7 +279,7 @@ Begin["`Private`"];
 					If[Length[npoints]==0 || Length[Nearest[Thread[npoints][[2]], #[[2]] ,{1,step*0.3}]] == 0,
 						AppendTo[npoints, #];
 					,
-						rejectedCounterNss += 1;
+						rejectedCounterNNS += 1;
 					];
 				)&, nnpoints] ~rec~ {"NNS-2", Length[nnpoints]};
 			];
