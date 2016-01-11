@@ -174,6 +174,7 @@ Begin["`Private`"];
 		rejectedCounterGrad = 0;
 		rejectedCounterVal = 0;
 		rejectedCounterRat = 0;
+		rejectedCounterNss = 0;
 		intEnergyTracker = { Info["EnergySP"], Info["EnergySP"] };
 		maxEVTracker = 0;
 		maxGradientTracker = 0;
@@ -267,6 +268,7 @@ Begin["`Private`"];
 				If[Length[nearf[npoint,{1,step*0.3}]] == 0,
 					{ #[[1]] , npoint }
 				,
+					rejectedCounterNss += 1;
 					Nothing
 				]
 			]&, npoints] ~rec~ {"NNS-1", Length[npoints]};
@@ -278,6 +280,8 @@ Begin["`Private`"];
 				Scan[(
 					If[Length[npoints]==0 || Length[Nearest[Thread[npoints][[2]], #[[2]] ,{1,step*0.3}]] == 0,
 						AppendTo[npoints, #];
+					,
+						rejectedCounterNss += 1;
 					];
 				)&, nnpoints] ~rec~ {"NNS-2", Length[nnpoints]};
 			];
