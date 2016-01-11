@@ -263,6 +263,7 @@ Begin["`Private`"];
 			{ "Dimension of Hilbert Space", Style[TextString[info["HilbertSpaceDimension"]],Bold] },
 			{ "Step size guess", TextString[info["StepSize"]] }
 		};
+		textgrid = Transpose[{ Style[#,GrayLevel[.25]]& /@ Transpose[textgrid][[1]], Transpose[textgrid][[2]] }];
 		
 		Return[Panel[TextGrid[
 			textgrid,
@@ -281,6 +282,7 @@ Begin["`Private`"];
 			{ "Number of total points gathered" , Style[TextString[Length[BProbe`Scan`Private`pointlist]],Bold] },
 			{ "Number of points currently processing" , Length[BProbe`Scan`Private`boundary] }
 		};
+		points = Transpose[{ Style[#,GrayLevel[.25]]& /@ Transpose[points][[1]], Transpose[points][[2]] }];
 		
 		tracker = Flatten[Reap[
 			If[opts[GradientTracker] || (opts[MaxGradient] < \[Infinity]),
@@ -295,6 +297,9 @@ Begin["`Private`"];
 				Sow[{ "Largest emerged 'small' Eigenvalue" , TextString[BProbe`Scan`Private`maxEVTracker] }];
 			];
 		][[2]],1];
+		If[Length[tracker]!=0,
+			tracker = Transpose[{ Style[#,GrayLevel[.25]]& /@ Transpose[tracker][[1]], Transpose[tracker][[2]] }];
+		];
 		
 		rejections = Flatten[Reap[
 			If[opts[MaxEV] < \[Infinity],
@@ -309,6 +314,9 @@ Begin["`Private`"];
 				Sow[{ "Rejected points due to 'MaxGradient'" , Style[TextString[BProbe`Scan`Private`rejectedCounterGrad], Darker[Red]] }];
 			];
 		][[2]],1];
+		If[Length[rejections]!=0,
+			rejections = Transpose[{ Style[#,GrayLevel[.25]]& /@ Transpose[rejections][[1]], Transpose[rejections][[2]] }];
+		];
 		
 		status = Flatten[Reap[
 			Sow[{ getPanel["Status Information", points] }];
