@@ -87,7 +87,34 @@ Begin["`Private`"];
 		];
 		
 		(* print it out again, so it doesnt just vanish when finished *)
-		Print[generateStatus[FilterRules[{opts}, Options[BProbe`Scan`start]]]];
+		If[Length[BProbe`Scan`getList[]] > 1,
+			Print[generateStatus[FilterRules[{opts}, Options[BProbe`Scan`start]]]];
+		,
+			(* else print some recommendation to get something work *)
+			Print["Oops, no points have been collected, ..."];
+			If[OptionValue[Dimension] == 0,
+				Print["... because the specified dimension is zero. You might want to override it via the 'Dimension'-option."];
+			,
+				If[BProbe`Scan`Private`rejectedCounterGrad > 0,
+					Print["... you might want to raise the gradient cutoff via the 'MaxGradient' option."];
+				];
+				If[BProbe`Scan`Private`rejectedCounterRat > 0,
+					Print["... you might want to raise the eigenvalue cutoff via the 'MaxEV' option."];
+				];
+				If[BProbe`Scan`Private`rejectedCounterVal > 0,
+					Print["... you might want to raise the energy cutoff via the 'MaxEnergy' option."];
+				];
+				If[BProbe`Scan`Private`rejectedCounterNNS > 0 &&
+					BProbe`Scan`Private`rejectedCounterGrad == 0 &&
+					BProbe`Scan`Private`rejectedCounterRat == 0 &&
+					BProbe`Scan`Private`rejectedCounterVal == 0 &&
+					OptionValue[ReplacePoints],
+					Print["... you might want to raise the step size via the 'StepSize' option or deactivate the 'ReplacePoints' option."];
+				];
+			];
+			
+			ProbeReset[];
+		];
 		
 		(* print profiling chart if enabled *)
 		If[OptionValue[Profiling], Print[BProbe`Profiler`ShowProfileChart[]]];
