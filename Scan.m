@@ -260,16 +260,20 @@ Begin["`Private`"];
 			
 			(* NNS - first check on existing points *)
 			(*---------------------------------------------*)
-			nearf = Nearest[pointlist] ~rec~ "NNS-0";
-			npoints = Map[Block[{npoint},
-				npoint = #[[2]];
-				If[Length[nearf[npoint,{1,step*0.3}]] == 0,
-					{ #[[1]] , npoint }
-				,
-					rejectedCounterNNS += 1;
-					Nothing
-				]
-			]&, npoints] ~rec~ {"NNS-1", Length[npoints]};
+			Block[{lbefore=Length[npoints]},
+				DistributeDefinitions[pointlist];
+				ParallelEvaluate[nearf = Nearest[pointlist]] ~rec~ "NNS-0";
+				npoints = ParallelMap[Block[{npoint},
+					npoint = #[[2]];
+					If[Length[nearf[npoint,{1,step*0.3}]] == 0,
+						{ #[[1]] , npoint }
+					,
+						Nothing
+					]
+				]&, npoints] ~rec~ {"NNS-1", Length[npoints]};
+				
+				rejectedCounterNNS += (lbefore - Length[npoints]);
+			];
 			
 			(* NNS - second check on new points *)
 			(*---------------------------------------------*)
