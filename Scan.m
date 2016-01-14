@@ -33,6 +33,7 @@ BeginPackage["BProbe`Scan`"];
 	start::usage="start";
 	reset::usage="reset";
 	getPoints::usage="getPoints";
+	getTangentspaces::usage="getTangentspace";
 	getMinEigenvalue::usage="";
 	getEigenvalues::usage="";
 	getState::usage="";
@@ -166,6 +167,7 @@ Begin["`Private`"];
 		(* init stuff *)
 		ResetProfile[];
 		pointlist = {Info["StartingPoint"]};
+		tangentspacelist = {};
 		
 		boundary = {{1,1}};
 	
@@ -182,6 +184,7 @@ Begin["`Private`"];
 	
 	
 	getPoints[] := Return[pointlist];
+	getTangentspaces[] := Return[tangentspacelist];
 	getMinEigenvalue[p_] := Abs[Eigenvalues[cop @@ N[p], -1][[1]]];
 	getEigenvalues[p_] := Eigenvalues[cop @@ N[p]];
 	getState[p_] := Eigenvectors[cop @@ N[p],-1][[1]];
@@ -219,12 +222,14 @@ Begin["`Private`"];
 		While[Length[boundary] != 0, Block[{dirs, npoints, nearf},
 			
 			(* look whether already calculated; this would be the case if MaxGradient is set *)
-			If[Length[directions] == Length[boundary],
-				dirs = Riffle[#, -#]& /@ directions;
+			dirs = If[Length[directions] == Length[boundary],
+				directions
 			,
-				(* determine 'small' directions and double them (forward, backward) *)
-				dirs = Riffle[#, -#]& /@ determineDirections[pointlist[[Thread[boundary][[2]]]]];
+				(* determine 'small' directions *)
+				determineDirections[pointlist[[Thread[boundary][[2]]]]]
 			];
+			tangentspacelist = tangentspacelist ~Join~ dirs;
+			dirs = Riffle[#, -#]& /@ dirs (* double directions (forward, backward) *);
 			
 			(* gather all potential new points *)
 			(*---------------------------------------------*)
