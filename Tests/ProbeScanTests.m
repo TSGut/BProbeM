@@ -125,7 +125,7 @@ VerificationTest[ProbeGetPoints[]
 		same = True;
 		
 		For[i=1,i<=Length[list1],i++,
-			If[Norm[list1[[i]]-list2[[i]]] > 10^-6,
+			If[Norm[list1[[i]]-list2[[i]]] > 10^-5,
 			same = False;
 			];
 		];
