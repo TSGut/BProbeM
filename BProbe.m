@@ -30,6 +30,7 @@ BeginPackage["BProbe`"];
 	ProbeInit::usage = "";
 	ProbeScan::usage = "";
 	ProbeGetPoints::usage = "";
+	ProbeGetTangentspaces::usage = "";
 	ProbeReset::usage = "";
 	ProbeGetGroundstateEnergy::usage = "";
 	ProbeGetEnergies::usage = "";
@@ -123,6 +124,10 @@ Begin["`Private`"];
 	
 	ProbeGetPoints[] := Block[{},
 		Return[BProbe`Scan`getPoints[]];
+	] /; inited;
+	
+	ProbeGetTangentspaces[] := Block[{},
+		Return[BProbe`Scan`getTangentspaces[]];
 	] /; inited;
 	
 	ProbeGetGroundstateEnergy[p_?(VectorQ[#,NumericQ]&)] := Block[{},
@@ -370,6 +375,8 @@ End[];
 	ProbeScan::usage = BProbe`Private`header["ProbeScan", {{"Real", "step size"}}] <> " performs the actual scanning procedure. It implements an algorithm to rasterize the semi-classical limit of the brane configuration defined by a set of matrices as submanifold of the target space.";
 	
 	ProbeGetPoints::usage = BProbe`Private`header["ProbeGetPoints",{}] <> " returns a " <> BProbe`Private`doc["List"] <> " of already calculated points. A point is itself represented as a " <> BProbe`Private`doc["List"] <> " consisting of d " <> BProbe`Private`doc["Real"] <> "s.";
+	
+	ProbeGetTangentspaces::usage = BProbe`Private`header["ProbeGetTangentspaces",{}] <> " returns a " <> BProbe`Private`doc["List"] <> " of tangent spaces corresponding to the calculated points. The tangent spaces are represented by a " <> BProbe`Private`doc["List"] <> " of orthonormal basis vectors."
 	
 	ProbeReset::usage = BProbe`Private`header["ProbeReset",{}] <> " resets the package in a way, so that the command " <> BProbe`Private`header["ProbeScan", {{"Integer", "dimension"}, {"Real", "step size"}}] <> " starts a completely new calculation.";
 	
