@@ -87,7 +87,7 @@ Begin["`Private`"];
 		];
 		
 		(* print it out again, so it doesnt just vanish when finished *)
-		If[Length[BProbe`Scan`getList[]] > 1,
+		If[Length[BProbe`Scan`getPoints[]] > 1,
 			Print[generateStatus[FilterRules[{opts}, Options[BProbe`Scan`start]]]];
 		,
 			(* else print some recommendation to get something work *)
@@ -122,7 +122,7 @@ Begin["`Private`"];
 	] /; inited;
 	
 	ProbeGetPoints[] := Block[{},
-		Return[BProbe`Scan`getList[]];
+		Return[BProbe`Scan`getPoints[]];
 	] /; inited;
 	
 	ProbeGetGroundstateEnergy[p_?(VectorQ[#,NumericQ]&)] := Block[{},
@@ -138,7 +138,7 @@ Begin["`Private`"];
 	] /; inited;
 	
 	ProbeGetGroundstates[] := Block[{progress},
-		If[!IntegerQ[plHash] || Hash[BProbe`Scan`getList[]] != plHash,
+		If[!IntegerQ[plHash] || Hash[BProbe`Scan`getPoints[]] != plHash,
 			PrintTemporary["* Generate ground states ... ", ProgressIndicator[Dynamic[progress]]];
 			
 			Quiet[LaunchKernels[]];
@@ -146,9 +146,9 @@ Begin["`Private`"];
 			
 			states = PPMap[(
 				BProbe`Scan`getState[#]
-			)&, BProbe`Scan`getList[], progress, 100];
+			)&, BProbe`Scan`getPoints[], progress, 100];
 			
-			plHash = Hash[BProbe`Scan`getList[]];
+			plHash = Hash[BProbe`Scan`getPoints[]];
 		];
 		
 		Return[states];

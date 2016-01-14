@@ -32,7 +32,7 @@ BeginPackage["BProbe`Scan`"];
 	init::usage="init";
 	start::usage="start";
 	reset::usage="reset";
-	getList::usage="getlist";
+	getPoints::usage="getPoints";
 	getMinEigenvalue::usage="";
 	getEigenvalues::usage="";
 	getState::usage="";
@@ -181,7 +181,7 @@ Begin["`Private`"];
 	];
 	
 	
-	getList[] := Return[pointlist];
+	getPoints[] := Return[pointlist];
 	getMinEigenvalue[p_] := Abs[Eigenvalues[cop @@ N[p], -1][[1]]];
 	getEigenvalues[p_] := Eigenvalues[cop @@ N[p]];
 	getState[p_] := Eigenvectors[cop @@ N[p],-1][[1]];
