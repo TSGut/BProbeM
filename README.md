@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/20072/lschneiderbauer/BProbe.svg)](https://zenodo.org/badge/latestdoi/20072/lschneiderbauer/BProbe)
+
 ## What is `BProbe`?
 
 `BProbe` is a [Wolfram Mathematica](https://www.wolfram.com/mathematica/) package. It is the implementation of an algorithm which rasterizes the semi-classical limit of a fuzzy brane described by a set of matrices. The underlying theory is not described in this document, and for a comprehensive treatment is referred to TODO-paper.
