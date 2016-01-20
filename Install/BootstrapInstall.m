@@ -44,7 +44,7 @@ Block[{locdir, files, root, meta, metaloc, result, json, url},
 	locdir = FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe"}];
 
 	Print["Fetch latest version url ..."];
-	json = ImportString[URLFetch["https://api.github.com/repos/vootey/BProbe/releases/latest"],"RawJSON"];
+	json = ImportString[URLFetch["https://api.github.com/repos/lschneiderbauer/BProbe/releases/latest"],"RawJSON"];
 	url = json["assets"][[1]]["browser_download_url"];
 	Print["URL: " <> url];
 
