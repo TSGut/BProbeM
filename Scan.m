@@ -75,6 +75,7 @@ Begin["`Private`"];
 		
 		(* find global minimum *)
 		Block[{f2,p,s},
+			If[OptionValue["StartingPoint"] == "GlobalMinimum",
 			PrintTemporary["* Look for global minimum of displacement energy ..."];
 			p = Table[Unique["p"], {Length[t]}];
 			p[[Complement[Range[Length[t]],subspace]]] = 0;
@@ -82,6 +83,7 @@ Begin["`Private`"];
 			f2[p__?NumericQ] := energyf[{p}];
 			s = NMinimize[f2 @@ p,p];
 			gMinEnergyPoint = p /. s[[2]];
+			];
 		];
 		
 		(* guess some step size (at least of the correct order) *)
@@ -130,7 +132,7 @@ Begin["`Private`"];
 		];
 		
 		expr = ComplexExpand[m];
-		cm = Compile @@ {DeleteCases[p,0], expr, RuntimeOptions->"Speed", CompilationTarget->"C"};
+		cm = Compile @@ {DeleteCases[p,0], expr, RuntimeOptions->"Speed"};
 		
 		Return[cm];
 	];
@@ -140,7 +142,7 @@ Begin["`Private`"];
 		
 		x = Table[Unique["x"], n];
 		expr = ComplexExpand[(Conjugate[x].#.x)& /@ obs, x];
-		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr, RuntimeOptions->"Speed", CompilationTarget->"C"};
+		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr, RuntimeOptions->"Speed"};
 		
 		Return[cexp];
 	];
