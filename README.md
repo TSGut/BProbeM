@@ -21,7 +21,7 @@ For matters regarding the original BProbe, please refer to details on [its websi
 
 ## Software License
 
-BProbeM Copyright 2018 Timon Salar Gutleb
+BProbeM Copyright 2018 Timon Salar Gutleb, 
 BProbe Copyright 2015 Lukas Schneiderbauer
 
 Both BProbeM and BProbe are free software: you can redistribute them and/or modify
