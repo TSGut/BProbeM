@@ -242,7 +242,8 @@ Begin["`Private`"];
 	(*--------------------------------------------------------------*)
 	Options[getDirectionalScan] = {
 		StepNumber -> 100,
-		ShowAutoPlot -> True
+		ShowAutoPlot -> True,
+		ReplacePoints-> False
 	}
 	
 	getDirectionalScan[s_,opts:OptionsPattern[]] := Block[{plotspace,stepsize,k,v,mu,i,m,reset,vneg,vpos,dimension},
@@ -266,15 +267,29 @@ Begin["`Private`"];
 			vpos = reset;
     		vneg[[m]] = v[[m]] - (k + 1)*stepsize;
 			vpos[[m]] = v[[m]] - stepsize;
-			For[i = 1, i <= k, i++,
-				vneg[[m]] = vneg[[m]] + stepsize;
-				vpos[[m]] = vpos[[m]] + stepsize;
-				plotspace[[i, m]] = Abs[Eigenvalues[cop @@ N[vneg], -1][[1]]]; (* Gets the - values *)
-				plotspace[[i+k+1,m]] = Abs[Eigenvalues[cop @@ N[vpos], -1][[1]]]; (* Gets the + values *)
+			If[Not[ReplacePoints],
+				For[i = 1, i <= k, i++,
+					vneg[[m]] = vneg[[m]] + stepsize;
+					vpos[[m]] = vpos[[m]] + stepsize;
+					plotspace[[i, m]] = Abs[Eigenvalues[cop @@ N[vneg], -1][[1]]]; (* Gets the - values *)
+					plotspace[[i+k+1,m]] = Abs[Eigenvalues[cop @@ N[vpos], -1][[1]]]; (* Gets the + values *)
+				];
+				If[i==k+1, (* then *)
+					vneg[[m]] = vneg[[m]] + stepsize;
+					plotspace[[i, m]] = Abs[Eigenvalues[cop @@ N[vneg], -1][[1]]]; (* Gets the - values *)
+				];
 			];
-			If[i==k+1, (* then *)
-				vneg[[m]] = vneg[[m]] + stepsize;
-				plotspace[[i, m]] = Abs[Eigenvalues[cop @@ N[vneg], -1][[1]]]; (* Gets the - values *)
+			If[ReplacePoints,
+				For[i = 1, i <= k, i++,
+					vneg[[m]] = vneg[[m]] + stepsize;
+					vpos[[m]] = vpos[[m]] + stepsize;
+					plotspace[[i, m]] = Abs[Eigenvalues[cop @@ N[getExpectedLocation[getState[vneg]]], -1][[1]]]; (* Gets the - values *)
+					plotspace[[i+k+1,m]] = Abs[Eigenvalues[cop @@ N[getExpectedLocation[getState[vpos]]], -1][[1]]]; (* Gets the + values *)
+				];
+				If[i==k+1, (* then *)
+					vneg[[m]] = vneg[[m]] + stepsize;
+					plotspace[[i, m]] = Abs[Eigenvalues[cop @@ N[getExpectedLocation[getState[vneg]]], -1][[1]]]; (* Gets the - values *)
+				];
 			];
 		];
 		
