@@ -1,34 +1,38 @@
 (* ::Package:: *)
 
 (*
-	Copyright 2015 Lukas Schneiderbauer (lukas.schneiderbauer@gmail.com)
 
+	This file is part of BProbeM.
+	
+	"BProbeM, quantum and fuzzy geometry scanner" Copyright 2018 Timon Gutleb (timon.gutleb@gmail.com),
+	see LINK
+	
+	Original version "BProbe" Copyright 2015 Lukas Schneiderbauer (lukas.schneiderbauer@gmail.com),
+	see https://github.com/lschneiderbauer/BProbe
 
-    This file is part of BProbe.
-
-    BProbe is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    BProbeM and BProbe are free software: you can redistribute them and/or modify
+    them under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    BProbe is distributed in the hope that it will be useful,
+    BProbeM and BProbe are distributed in the hope that they will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with BProbe.  If not, see <http://www.gnu.org/licenses/>.
+    along with BProbeM. If not, see <http://www.gnu.org/licenses/>.
 
 *)
 
 
 
-BeginPackage["BProbe`Scan`"];
+BeginPackage["BProbeM`Scan`"];
 
-	Get["BProbe`Profiler`"]
-	Get["BProbe`Gamma`"];
+	Get["BProbeM`Profiler`"]
+	Get["BProbeM`Gamma`"];
 
-	(* we don't need to expose this, since the user doesn't see it anyhow *)
+	(* We do not need to expose this, since the user does not see it *)
 	init::usage="init";
 	start::usage="start";
 	reset::usage="reset";
@@ -38,16 +42,24 @@ BeginPackage["BProbe`Scan`"];
 	getEigenvalues::usage="";
 	getState::usage="";
 	getExpectedLocation::usage="";
+	getDirectionalScan::usage="getDirectionalScan"
+	getDirectionalData::usage="getDirectionalData"
+	getDirectionalPlot::usage="getDirectionalPlot"
+	getOperator::usage="getOperator"
 
 
 Begin["`Private`"];
 
+	(*--------------------------------------------------------------*)
+	(* PROBEINIT section BEGINS *)
+	(*--------------------------------------------------------------*)
+	
 	Options[init] = {
 		Probe -> "Laplace",
 		Subspace -> Full,
 		StartingPoint -> "GlobalMinimum"
 	}
-	init[t_, opts:OptionsPattern[]] := Block[{stepsizeguess, subspace, obs, gdim, hdim},
+	init[t_, opts:OptionsPattern[]] := Block[{stepsizeguess, obs, gdim, hdim},
 		
 		If[Not[ListQ[OptionValue[Subspace]]],
 			(* in this case, take the full space *)
@@ -76,13 +88,13 @@ Begin["`Private`"];
 		(* find global minimum *)
 		Block[{f2,p,s},
 			If[OptionValue["StartingPoint"] == "GlobalMinimum",
-			PrintTemporary["* Look for global minimum of displacement energy ..."];
-			p = Table[Unique["p"], {Length[t]}];
-			p[[Complement[Range[Length[t]],subspace]]] = 0;
-			p = DeleteCases[p,0];
-			f2[p__?NumericQ] := energyf[{p}];
-			s = NMinimize[f2 @@ p,p];
-			gMinEnergyPoint = p /. s[[2]];
+				PrintTemporary["* No manual starting point set, attempting to search for global minimum of displacement energy ..."];
+				p = Table[Unique["p"], {Length[t]}];
+				p[[Complement[Range[Length[t]],subspace]]] = 0;
+				p = DeleteCases[p,0];
+				f2[p__?NumericQ] := energyf[{p}];
+				s = NMinimize[f2 @@ p,p];
+				gMinEnergyPoint = p /. s[[2]];
 			];
 		];
 		
@@ -98,7 +110,7 @@ Begin["`Private`"];
 		
 		Info = <||>;
 		
-		(* reset needs initalized Info and gMinEnergyPoint set *)
+		(* reset needs initalized Info set *)
 		reset[StartingPoint -> OptionValue[StartingPoint]];
 		
 		Info["EnergyProbe"] = OptionValue[Probe];
@@ -122,17 +134,17 @@ Begin["`Private`"];
 			m = Sum[(IdentityMatrix[n] p[[i]] - t[[i]]).(IdentityMatrix[n] p[[i]] - t[[i]]), {i, 1, dim}];
 	
 		,"Dirac",
-			gamma = BProbe`Gamma`MatrixRepGamma[dim];
+			gamma = BProbeM`Gamma`MatrixRepGamma[dim];
 			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
 			
 		,"DiracSq",
-			gamma = BProbe`Gamma`MatrixRepGamma[dim];
+			gamma = BProbeM`Gamma`MatrixRepGamma[dim];
 			m = Sum[KroneckerProduct[gamma[[i]], (t[[i]] - IdentityMatrix[n] p[[i]])], {i, 1, dim}];
 			m = m.m;
 		];
 		
 		expr = ComplexExpand[m];
-		cm = Compile @@ {DeleteCases[p,0], expr, RuntimeOptions->"Speed"};
+		cm = Compile @@ {DeleteCases[p,0], expr, RuntimeOptions->"Speed",Parallelization->"True"};
 		
 		Return[cm];
 	];
@@ -142,13 +154,34 @@ Begin["`Private`"];
 		
 		x = Table[Unique["x"], n];
 		expr = ComplexExpand[(Conjugate[x].#.x)& /@ obs, x];
-		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr, RuntimeOptions->"Speed"};
+		cexp = Compile @@ {Thread[{x, Table[_Complex, Length[x]]}], expr, RuntimeOptions->"Speed",Parallelization->"True"};
 		
 		Return[cexp];
 	];
+	
+	(*--------------------------------------------------------------*)
+	(* PROBEINIT section ENDS *)
+	(*--------------------------------------------------------------*)
+	(****************************************************************)
+	(*--------------------------------------------------------------*)
+	(* PROBERESET section BEGINS *)
+	(*--------------------------------------------------------------*)
 
 	Options[reset] = { StartingPoint :> Info["StartingPoint"] };
 	reset[OptionsPattern[]] := Block[{branedim, evlist},
+	
+	(* This checks if gMinEnergyPoint has been set and if it has not (by manual setting of StartingPoint), alerts the user and computes it here *)
+		If[OptionValue["StartingPoint"] != "GlobalMinimum",
+			Block[{f2,p,s},
+				PrintTemporary["Global minimum not previously known from ProbeInit[] scan, now attempting to search for global minimum of displacement energy ..."];
+				p = Table[Unique["p"], {Length[t]}];
+				p[[Complement[Range[Length[t]],subspace]]] = 0;
+				p = DeleteCases[p,0];
+				f2[p__?NumericQ] := energyf[{p}];
+				s = NMinimize[f2 @@ p,p];
+				gMinEnergyPoint = p /. s[[2]];
+			];
+		];
 		
 		Info["StartingPoint"] = (OptionValue[StartingPoint] /. "GlobalMinimum" -> gMinEnergyPoint);
 		
@@ -184,6 +217,13 @@ Begin["`Private`"];
 		Return[Info];
 	];
 	
+	(*--------------------------------------------------------------*)
+	(* PROBERESET section ENDS *)
+	(*--------------------------------------------------------------*)
+	(****************************************************************)
+	(*--------------------------------------------------------------*)
+	(* ADDITIONAL BPROBE SCAN FUNCTIONALITY section BEGINS *)
+	(*--------------------------------------------------------------*)
 	
 	getPoints[] := Return[pointlist];
 	getTangentspaces[] := Return[tangentspacelist];
@@ -191,7 +231,79 @@ Begin["`Private`"];
 	getEigenvalues[p_] := Eigenvalues[cop @@ N[p]];
 	getState[p_] := Eigenvectors[cop @@ N[p],-1][[1]];
 	getExpectedLocation[state_] := Re[cexp @@ state];
+	getOperator[] := cop;
+	
+	(*--------------------------------------------------------------*)
+	(* ADDITIONAL BPROBE SCAN FUNCTIONALITY section ENDS *)
+	(*--------------------------------------------------------------*)
+	(****************************************************************)
+	(*--------------------------------------------------------------*)
+	(* DIRECTIONAL SCAN section BEGINS *)
+	(*--------------------------------------------------------------*)
+	Options[getDirectionalScan] = {
+		StepNumber -> 100,
+		ShowAutoPlot -> True
+	}
+	
+	getDirectionalScan[s_,opts:OptionsPattern[]] := Block[{plotspace,stepsize,k,v,mu,i,m,reset,vneg,vpos,dimension},
+	
+		dimension = Length[subspace];
+		v = ConstantArray[0, dimension]; (* v is the starting point of the testing, default is simply starting at 0 *)
+		vneg = ConstantArray[0, dimension];
+		vpos = ConstantArray[0, dimension];
+		reset = v; (* Save initial input for later resetting *)
+		
+		PrintTemporary["Performing directional scans in ",dimension, " different directions..."];
 
+		(* Initialization *)
+		k = OptionValue[StepNumber]; (* How MANY steps in each direction do we take when testing? *)
+		stepsize = s; (* How FAR do we go in each step? *)
+		plotspace = ConstantArray[0, {2*k+1, dimension}];
+  
+		(* Collect the smallest eigenvalues from operator at point v *)
+		For[m = 1, m <= dimension, m++,
+			vneg = reset;
+			vpos = reset;
+    		vneg[[m]] = v[[m]] - (k + 1)*stepsize;
+			vpos[[m]] = v[[m]] - stepsize;
+			For[i = 1, i <= k, i++,
+				vneg[[m]] = vneg[[m]] + stepsize;
+				vpos[[m]] = vpos[[m]] + stepsize;
+				plotspace[[i, m]] = Abs[Eigenvalues[cop @@ N[vneg], -1][[1]]]; (* Gets the - values *)
+				plotspace[[i+k+1,m]] = Abs[Eigenvalues[cop @@ N[vpos], -1][[1]]]; (* Gets the + values *)
+			];
+			If[i==k+1, (* then *)
+				vneg[[m]] = vneg[[m]] + stepsize;
+				plotspace[[i, m]] = Abs[Eigenvalues[cop @@ N[vneg], -1][[1]]]; (* Gets the - values *)
+			];
+		];
+		
+		(* Data needs to be combined into format that can be plotted *)
+		
+		directionaldata={Transpose[{stepsize*Range[-k, k], plotspace[[All, 1]]}]};
+		
+		For[i = 2, i <= dimension, i++,
+			directionaldata=Append[directionaldata,Transpose[{stepsize*Range[-k, k], plotspace[[All, i]]}]];
+		];
+		
+		If[OptionValue[ShowAutoPlot],
+		 Print[ListPlot[directionaldata, Frame->True, PlotLegends->All, PlotRange-> All]]
+		];
+		
+	];
+	
+	(*--------------------------------------------------------------*)
+	(* DIRECTIONAL SCAN section ENDS *)
+	(*--------------------------------------------------------------*)
+	(****************************************************************)
+	(*--------------------------------------------------------------*)
+	(* ADDITIONAL DIRECTIONAL SCAN FUNCTIONALITY section BEGINS *)
+	(*--------------------------------------------------------------*)
+	 getDirectionalPlot[] := Return[ListPlot[directionaldata, Frame->True, PlotLegends->All, PlotRange-> All]];
+	 getDirectionalData[] := Return[directionaldata];
+	(*--------------------------------------------------------------*)
+	(* ADDITIONAL DIRECTIONAL SCAN FUNCTIONALITY section ENDS *)
+	(*--------------------------------------------------------------*)
 	
 	Options[start] = {
 		Dimension :> Info["BraneDimension"],
@@ -345,8 +457,6 @@ Begin["`Private`"];
 		
 	];
 
-
-
 (* PRIVATE METHODS (informal) *)
 
 	(* determine directions for a batch of points *)
@@ -463,7 +573,14 @@ Begin["`Private`"];
 		Return[ret];
 	];
 
-
+	(*--------------------------------------------------------------*)
+	(*--------------------------------------------------------------*)
+	(*--------------------------------------------------------------*)
+	(*--------------------------------------------------------------*)
+	(*--------------------------------------------------------------*)
+	(*--------------------------------------------------------------*)
+	(*--------------------------------------------------------------*)
+	(*--------------------------------------------------------------*)
 
 Options[NHessian]={Scale->10^-3};
 NHessian[f_,x_?(VectorQ[#,NumericQ]&),opts___?OptionQ] := Block[{n,h,norm,z,mat,f0},
