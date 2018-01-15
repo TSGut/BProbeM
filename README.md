@@ -2,7 +2,7 @@
 
 `BProbeM, a fuzzy quantum geometry scanner` is a [Wolfram Mathematica](https://www.wolfram.com/mathematica/) package. It is the implementation of an algorithm which rasterizes the semi-classical limit of a fuzzy brane described by a set of matrices. 
 
-BProbeM is a fork of BProbe by Lukas Schneiderbauer, adding several features for scanning such as the newly added directional scans, improves and completes missing documentation and improves computational time by changing how some internal procedures are handled.
+BProbeM is a [fork](https://en.wikipedia.org/wiki/Fork_(software_development)) of BProbe by Lukas Schneiderbauer, adding several features for scanning such as the newly added directional scans, improves and completes missing documentation and improves computational time by changing how some internal procedures are handled.
 
 The underlying theory is not described in this document, and for a comprehensive treatment is referred to [the paper introducing the original BProbe](https://arxiv.org/abs/1601.08007).
 
