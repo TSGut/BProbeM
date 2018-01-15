@@ -1,14 +1,14 @@
 {
   "author": {
-    "name": "Lukas Schneiderbauer",
-    "email": "lukas.schneiderbauer@gmail.com"
+    "name": "Timon Salar Gutleb",
+    "email": "timon.gutleb@gmail.com"
   },
-  "name": "BProbe",
-  "version": "0.9.0",
+  "name": "BProbeM",
+  "version": "0.9.1",
   "mathematica_version": "10.0",
   "dependencies": {
   },
-  "description": "`BProbe` is a Hyperlink[\"Wolfram Mathematica\",\"https://www.wolfram.com/mathematica/\"] package. It is the implementation of an algorithm which rasterizes the semi-classical limit of a fuzzy brane described by a set of matrices.",
-  "url": "https://github.com/vootey/BProbe/wiki",
+  "description": "`BProbeM` is a Hyperlink[\"Wolfram Mathematica\",\"https://www.wolfram.com/mathematica/\"] package. It is the implementation of an algorithm which rasterizes the semi-classical limit of a fuzzy brane described by a set of matrices. It is a fork of BProbe by Lukas Schneiderbauer.",
+  "url": "https://github.com/TSGut/BProbeM/",
   "license": "GPLv3"
 }
