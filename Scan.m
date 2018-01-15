@@ -267,7 +267,7 @@ Begin["`Private`"];
 			vpos = reset;
     		vneg[[m]] = v[[m]] - (k + 1)*stepsize;
 			vpos[[m]] = v[[m]] - stepsize;
-			If[Not[ReplacePoints],
+			If[Not[OptionValue[ReplacePoints]],
 				For[i = 1, i <= k, i++,
 					vneg[[m]] = vneg[[m]] + stepsize;
 					vpos[[m]] = vpos[[m]] + stepsize;
@@ -279,7 +279,7 @@ Begin["`Private`"];
 					plotspace[[i, m]] = Abs[Eigenvalues[cop @@ N[vneg], -1][[1]]]; (* Gets the - values *)
 				];
 			];
-			If[ReplacePoints,
+			If[OptionValue[ReplacePoints],
 				For[i = 1, i <= k, i++,
 					vneg[[m]] = vneg[[m]] + stepsize;
 					vpos[[m]] = vpos[[m]] + stepsize;
