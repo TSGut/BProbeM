@@ -41,10 +41,10 @@ CleanUp[root_] := Block[{},
 
 Block[{locdir, files, root, meta, metaloc, result, json, url},
 
-	locdir = FileNameJoin[{$UserBaseDirectory, "Applications", "BProbe"}];
+	locdir = FileNameJoin[{$UserBaseDirectory, "Applications", "BProbeM"}];
 
 	Print["Fetch latest version url ..."];
-	json = ImportString[URLFetch["https://api.github.com/repos/lschneiderbauer/BProbe/releases/latest"],"RawJSON"];
+	json = ImportString[URLFetch["https://api.github.com/repos/TSGut/BProbeM/releases/latest"],"RawJSON"];
 	url = json["assets"][[1]]["browser_download_url"];
 	Print["URL: " <> url];
 
@@ -52,7 +52,7 @@ Block[{locdir, files, root, meta, metaloc, result, json, url},
 	root = CreateDirectory[];
 	files = ExtractArchive[FetchURL[ url ], root];
 
-	root = FileNameJoin[{root, "BProbe"}];
+	root = FileNameJoin[{root, "BProbeM"}];
 	If[Not[DirectoryQ[root]],
 		Print["The archive folder structure is not as expected ... Aborting."];
 		Abort[];
