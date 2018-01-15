@@ -1,36 +1,37 @@
-[![DOI](https://zenodo.org/badge/20072/lschneiderbauer/BProbe.svg)](https://zenodo.org/badge/latestdoi/20072/lschneiderbauer/BProbe)
+## What is `BProbeM`?
 
-## What is `BProbe`?
+`BProbeM, a fuzzy quantum geometry scanner` is a [Wolfram Mathematica](https://www.wolfram.com/mathematica/) package. It is the implementation of an algorithm which rasterizes the semi-classical limit of a fuzzy brane described by a set of matrices. 
 
-`BProbe` is a [Wolfram Mathematica](https://www.wolfram.com/mathematica/) package. It is the implementation of an algorithm which rasterizes the semi-classical limit of a fuzzy brane described by a set of matrices. The underlying theory is not described in this document, and for a comprehensive treatment is referred to TODO-paper.
+BProbeM is a fork of BProbe by Lukas Schneiderbauer, adding several features for scanning such as the newly added directional scans, improves and completes missing documentation and improves computational time by changing how some internal procedures are handled.
 
-
+The underlying theory is not described in this document, and for a comprehensive treatment is referred to [the paper introducing the original BProbe](https://arxiv.org/abs/1601.08007).
 
 ## Installation & Getting Started
 
-Please see the [project wiki page](https://github.com/vootey/BProbe/wiki/Installation-&-Getting-Started).
-
+Please see the [project wiki page](https://github.com/TSGut/BProbeM/wiki/Installation-&-Getting-Started).
 
 
 ## Contact
 
-You can contact me via email: lukas.schneiderbauer@gmail.com
+For matters regarding BProbeM please send your emails to: timon.gutleb@gmail.com
+
+For matters regarding the original BProbe, please refer to details on [its website](https://github.com/lschneiderbauer/BProbe).
 
 
 
 ## Software License
 
-Copyright 2015 Lukas Schneiderbauer
+BProbeM Copyright 2018 Timon Salar Gutleb
+BProbe Copyright 2015 Lukas Schneiderbauer
 
-
-BProbe is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
+Both BProbeM and BProbe are free software: you can redistribute them and/or modify
+them under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-BProbe is distributed in the hope that it will be useful,
+BProbeM and BProbe are distributed in the hope that they will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
