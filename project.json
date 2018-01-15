@@ -4,7 +4,7 @@
     "email": "timon.gutleb@gmail.com"
   },
   "name": "BProbeM",
-  "version": "0.9.1",
+  "version": "1.0.0-alpha",
   "mathematica_version": "10.0",
   "dependencies": {
   },
