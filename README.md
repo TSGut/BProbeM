@@ -15,15 +15,14 @@ Please see the [project wiki page](https://github.com/TSGut/BProbeM/wiki/Install
 
 For matters regarding BProbeM please send your emails to: timon.gutleb@gmail.com
 
-For matters regarding the original BProbe, please refer to details on [its website](https://github.com/lschneiderbauer/BProbe).
-
+For matters regarding the original BProbe, please refer to details on [its own GitHub page](https://github.com/lschneiderbauer/BProbe).
 
 
 ## Software License
 
-BProbeM Copyright 2018 Timon Salar Gutleb, 
+`BProbeM, a fuzzy quantum geometry scanner` Copyright 2018 Timon Salar Gutleb, 
 
-BProbe Copyright 2015 Lukas Schneiderbauer
+`BProbe` Copyright 2015 Lukas Schneiderbauer
 
 Both BProbeM and BProbe are free software: you can redistribute them and/or modify
 them under the terms of the GNU General Public License as published by
@@ -42,4 +41,4 @@ along with BProbe.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Versioning
 
-Releases of this package will be numbered using [Semantic Versioning guidelines](http://semver.org/).
+Releases of this package follow [Semantic Versioning guidelines](http://semver.org/).
