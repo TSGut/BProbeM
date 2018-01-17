@@ -45,12 +45,12 @@ Block[{locdir, files, root, meta, metaloc, result, json, url},
 
 	Print["Fetch latest version url ..."];
 	json = ImportString[URLFetch["https://api.github.com/repos/TSGut/BProbeM/releases/latest"],"RawJSON"];
-	url = json["tarball_url"];
-	Print["URL: " <> url];
+	metafromurl = json["tag_name"];
+	Print["Latest version on Server: " <> metafromurl];
 
 	Print["Download and extract archive ..."];
 	root = CreateDirectory[];
-	files = ExtractArchive[FetchURL[ url ], root];
+	files = ExtractArchive[FetchURL["https://codeload.github.com/TSGut/BProbeM/legacy.tar.gz/"<>metafromurl], root];
 
 	root = FileNameJoin[{root, "BProbeM"}];
 	If[Not[DirectoryQ[root]],
