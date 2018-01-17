@@ -50,7 +50,10 @@ Block[{locdir, files, root, meta, metaloc, result, json, url},
 
 	Print["Download and extract archive ..."];
 	root = CreateDirectory[];
-	files = ExtractArchive[RenameFile[FetchURL["https://codeload.github.com/TSGut/BProbeM/tar.gz/"<>metafromurl],"archive.tar.gz"],root];
+	SetDirectory[root];
+	url=FetchURL["https://codeload.github.com/TSGut/BProbeM/tar.gz/"<>metafromurl];
+	url=RenameFile[url,url<>".tar.gz"];
+	files = ExtractArchive[url];
 
 	root = FileNameJoin[{root, FileNames["BProbe*"][[1]]}];
 	If[Not[DirectoryQ[root]],
