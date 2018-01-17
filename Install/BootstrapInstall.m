@@ -52,7 +52,7 @@ Block[{locdir, files, root, meta, metaloc, result, json, url},
 	root = CreateDirectory[];
 	files = ExtractArchive[RenameFile[FetchURL["https://codeload.github.com/TSGut/BProbeM/tar.gz/"<>metafromurl],"archive.tar.gz"],root];
 
-	root = FileNameJoin[{root, "FileNames["BProbe*"][[1]]"}];
+	root = FileNameJoin[{root, FileNames["BProbe*"][[1]]}];
 	If[Not[DirectoryQ[root]],
 		Print["The archive folder structure is not as expected ... Aborting."];
 		Abort[];
