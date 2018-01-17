@@ -20,9 +20,9 @@ For matters regarding the original BProbe, please refer to details on [its own G
 
 ## Software License
 
-`BProbeM, a fuzzy quantum geometry scanner` Copyright 2018 Timon Salar Gutleb, 
+`BProbeM, a fuzzy quantum geometry scanner` ©2018 Timon Salar Gutleb, 
 
-`BProbe` Copyright 2015 Lukas Schneiderbauer
+`BProbe` ©2015 Lukas Schneiderbauer
 
 Both BProbeM and BProbe are free software: you can redistribute them and/or modify
 them under the terms of the GNU General Public License as published by
