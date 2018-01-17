@@ -50,9 +50,9 @@ Block[{locdir, files, root, meta, metaloc, result, json, url},
 
 	Print["Download and extract archive ..."];
 	root = CreateDirectory[];
-	files = ExtractArchive[FetchURL["https://codeload.github.com/TSGut/BProbeM/legacy.tar.gz/"<>metafromurl], root];
+	files = ExtractArchive[RenameFile[FetchURL["https://codeload.github.com/TSGut/BProbeM/tar.gz/"<>metafromurl],"archive.tar.gz"],root];
 
-	root = FileNameJoin[{root, "BProbeM"}];
+	root = FileNameJoin[{root, "FileNames["BProbe*"][[1]]"}];
 	If[Not[DirectoryQ[root]],
 		Print["The archive folder structure is not as expected ... Aborting."];
 		Abort[];
