@@ -45,7 +45,7 @@ Block[{locdir, files, root, meta, metaloc, result, json, url},
 
 	Print["Fetch latest version url ..."];
 	json = ImportString[URLFetch["https://api.github.com/repos/TSGut/BProbeM/releases/latest"],"RawJSON"];
-	url = json["assets"][[1]]["browser_download_url"];
+	url = json["tarball_url"];
 	Print["URL: " <> url];
 
 	Print["Download and extract archive ..."];
