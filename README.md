@@ -1,4 +1,4 @@
-For the purposes of citations: [![DOI](https://zenodo.org/badge/113610208.svg)](https://zenodo.org/badge/latestdoi/113610208)
+For the purposes of citing: [![DOI](https://zenodo.org/badge/113610208.svg)](https://zenodo.org/badge/latestdoi/113610208)
 
 ## What is `BProbeM`?
 
