@@ -5,7 +5,7 @@
 	This file is part of BProbeM.
 	
 	"BProbeM, quantum and fuzzy geometry scanner" Copyright 2018 Timon Gutleb (timon.gutleb@gmail.com),
-	see LINK
+	see https://github.com/TSGut/BProbeM/
 	
 	Original version "BProbe" Copyright 2015 Lukas Schneiderbauer (lukas.schneiderbauer@gmail.com),
 	see https://github.com/lschneiderbauer/BProbe
