@@ -429,6 +429,8 @@ End[];
 	
 	ProbeGetGroundstates::usage = BProbeM`Private`header["ProbeGetGroundstates", {}] <> " returns the ground states of the (Laplace-/Dirac-) operator for all points given by " <>  BProbeM`Private`header["ProbeGetPoints", {}] <> "."
 	
+	ProbeGetOperator::usage = BProbeM`Private`header["ProbeGetOperator", {}] <> " returns the previously compiled (Laplace-/Dirac-) operator.";
+	
 	ProbeGetExpectedLocation::usage = BProbeM`Private`header["ProbeGetExpectedLocation", {{"List", "point"}}] <> " returns the expectation value of the quantized embedding functions corresponding to the ground state of the (Laplace-/Dirac-) operator in question for a given point.\n" <>
 	BProbeM`Private`header["ProbeGetExpectedLocation", {{"List", "state"}}] <> " returns the expectation value of the quantized embedding functions for the given state.";
 	
@@ -441,4 +443,4 @@ End[];
 
 EndPackage[];
 
-Print["Loaded BProbeM. See the " <> BProbeM`Private`link["index", "documentation"] <> " for help."];
+Print["Loaded BProbeM. See the wiki (",Hyperlink["https://github.com/TSGut/BProbeM/wiki"],") for documentation and help."];

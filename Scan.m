@@ -231,7 +231,7 @@ Begin["`Private`"];
 	getEigenvalues[p_] := Eigenvalues[cop @@ N[p]];
 	getState[p_] := Eigenvectors[cop @@ N[p],-1][[1]];
 	getExpectedLocation[state_] := Re[cexp @@ state];
-	getOperator[] := cop;
+	getOperator[] := Return[cop];
 	
 	(*--------------------------------------------------------------*)
 	(* ADDITIONAL BPROBE SCAN FUNCTIONALITY section ENDS *)
