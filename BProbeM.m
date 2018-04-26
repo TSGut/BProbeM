@@ -40,6 +40,7 @@ BeginPackage["BProbeM`"];
 	ProbeGetEnergies::usage = "";
 	ProbeGetGroundstate::usage = "";
 	ProbeGetExpectedLocation::usage = "";
+	ProbeGetOperator::usage = "";
 	ProbeDirectionalScan::usage = "";
 	ProbeGetDirectionalData::usage = "";
 	ProbeShowDirectionalPlot::usage = "";
