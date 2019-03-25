@@ -1,5 +1,5 @@
 [![DOI](https://img.shields.io/badge/DOI%20for%20citing-10.5281%2Fzenodo.1230730-brightgreen.svg?style=for-the-badge)](https://zenodo.org/badge/latestdoi/113610208)
-![GitHub](https://img.shields.io/github/license/TSGut/BProbeM.svg?style=for-the-badge)
+[![GitHub](https://img.shields.io/github/license/TSGut/BProbeM.svg?style=for-the-badge)](https://github.com/TSGut/BProbeM/blob/master/LICENSE)
 
 
 ## What is `BProbeM`?
