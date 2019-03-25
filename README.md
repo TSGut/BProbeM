@@ -12,14 +12,14 @@ The underlying theory is not described in this document, for a comprehensive tre
 
 ## Installation & Getting Started
 
-Please see the [project wiki page](https://github.com/TSGut/BProbeM/wiki/Installation-&-Getting-Started).
+Please see the [project wiki page](https://github.com/TSGut/BProbeM/wiki/Installation-&-Getting-Started) and the example notebooks provided in the Examples folder of this repository.
 
 
 ## Contact
 
 For matters regarding BProbeM please send your emails to: timon.gutleb@gmail.com
 
-For matters regarding the original BProbe, please refer to details on [its own GitHub page](https://github.com/lschneiderbauer/BProbe).
+For matters regarding the original BProbe, please refer to details on [its own GitHub repository](https://github.com/lschneiderbauer/BProbe).
 
 
 ## Software License
@@ -40,7 +40,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with BProbe.  If not, see <http://www.gnu.org/licenses/>.
-
 
 
 ## Versioning
