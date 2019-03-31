@@ -11,6 +11,8 @@ BProbeM is an updated [fork](https://en.wikipedia.org/wiki/Fork_(software_develo
 
 The underlying theory is not described in this document, for a comprehensive treatment please refer to [the paper introducing the original BProbe](https://arxiv.org/abs/1601.08007).
 
+If you use this software in your projects / research, please cite it using the following DOI: https://doi.org/10.5281/zenodo.2616687
+
 ## Installation & Getting Started
 
 Please see the [project wiki page](https://github.com/TSGut/BProbeM/wiki/Installation-&-Getting-Started) and the example notebooks provided in the Examples folder of this repository.
