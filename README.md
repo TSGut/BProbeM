@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2616687.svg)](https://doi.org/10.5281/zenodo.2616687)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2616687.svg)](https://zenodo.org/badge/latestdoi/113610208)
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://github.com/TSGut/BProbeM/wiki)
 [![GitHub](https://img.shields.io/github/license/TSGut/BProbeM.svg)](https://github.com/TSGut/BProbeM/blob/master/LICENSE)
 
@@ -11,7 +11,7 @@ BProbeM is an updated [fork](https://en.wikipedia.org/wiki/Fork_(software_develo
 
 The underlying theory is not described in this document, for a comprehensive treatment please refer to [the paper introducing the original BProbe](https://arxiv.org/abs/1601.08007).
 
-If you use this software in your projects / research, please cite it using the following DOI: https://doi.org/10.5281/zenodo.2616687
+If you use this software in your projects / research, please cite it using the following DOI: https://zenodo.org/badge/latestdoi/113610208
 
 ## Installation & Getting Started
 
