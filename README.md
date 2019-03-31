@@ -1,4 +1,4 @@
-[![DOI for citing](https://zenodo.org/badge/DOI/10.5281/zenodo.2616687.svg)](https://doi.org/10.5281/zenodo.2616687)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2616687.svg)](https://doi.org/10.5281/zenodo.2616687)
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://github.com/TSGut/BProbeM/wiki)
 [![GitHub](https://img.shields.io/github/license/TSGut/BProbeM.svg)](https://github.com/TSGut/BProbeM/blob/master/LICENSE)
 
